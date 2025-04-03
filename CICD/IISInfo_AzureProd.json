@@ -1,0 +1,993 @@
+﻿{
+  "ApplicationPools": [
+    {
+      "State": "Started",
+      "Name": ".NET v4.5"
+    },
+    {
+      "State": "Started",
+      "Name": ".NET v4.5 Classic"
+    },
+    {
+      "State": "Started",
+      "Name": "academiccalendarpetitions.em.wsu.edu"
+    },
+    {
+      "State": "Started",
+      "Name": "athleticeligibility.wsu.edu"
+    },
+    {
+      "State": "Started",
+      "Name": "awstats.em.wsu.edu"
+    },
+    {
+      "State": "Started",
+      "Name": "cancel.wsu.edu"
+    },
+    {
+      "State": "Started",
+      "Name": "catalog.wsu.edu"
+    },
+    {
+      "State": "Started",
+      "Name": "CommencementRegistration.em.wsu.edu"
+    },
+    {
+      "State": "Started",
+      "Name": "DefaultAppPool"
+    },
+    {
+      "State": "Started",
+      "Name": "EM-AcademicCalendarPetitions"
+    },
+    {
+      "State": "Started",
+      "Name": "EM-Prod.em.wsu.edu.Credentials"
+    },
+    {
+      "State": "Started",
+      "Name": "EM-Prod.em.wsu.edu.Orientation"
+    },
+    {
+      "State": "Started",
+      "Name": "fax.em.wsu.edu"
+    },
+    {
+      "State": "Started",
+      "Name": "flex.em.wsu.edu"
+    },
+    {
+      "State": "Started",
+      "Name": "forms.em.wsu.edu"
+    },
+    {
+      "State": "Started",
+      "Name": "Goto.wsu.edu"
+    },
+    {
+      "State": "Started",
+      "Name": "help.em.wsu.edu"
+    },
+    {
+      "State": "Started",
+      "Name": "mailprocessor.em.wsu.edu"
+    },
+    {
+      "State": "Started",
+      "Name": "Prod.em.wsu.edu"
+    },
+    {
+      "State": "Started",
+      "Name": "Prod.em.wsu.edu.Credentials"
+    },
+    {
+      "State": "Started",
+      "Name": "Prod.em.wsu.edu.Dependencies"
+    },
+    {
+      "State": "Started",
+      "Name": "prod.em.wsu.edu.Flex"
+    },
+    {
+      "State": "Started",
+      "Name": "prod.em.wsu.edu.Hello"
+    },
+    {
+      "State": "Started",
+      "Name": "Prod.em.wsu.edu.Orientation"
+    },
+    {
+      "State": "Started",
+      "Name": "Prod.em.wsu.edu.SAP"
+    },
+    {
+      "State": "Started",
+      "Name": "Prod.em.wsu.edu.screenshotexe"
+    },
+    {
+      "State": "Started",
+      "Name": "prod.em.wsu.edu.Tasks"
+    },
+    {
+      "State": "Started",
+      "Name": "prod.em.wsu.edu.Touchpoints"
+    },
+    {
+      "State": "Started",
+      "Name": "prod.em.wsu.edu.TouchPointsData"
+    },
+    {
+      "State": "Started",
+      "Name": "Prod.em.wsu.edu.WSAF"
+    },
+    {
+      "State": "Started",
+      "Name": "purchasing.em.wsu.edu"
+    },
+    {
+      "State": "Started",
+      "Name": "schedules.wsu.edu"
+    },
+    {
+      "State": "Started",
+      "Name": "servicecontracts.em.wsu.edu"
+    },
+    {
+      "State": "Started",
+      "Name": "sfsapps.em.wsu.edu"
+    },
+    {
+      "State": "Started",
+      "Name": "sfsapps.em.wsu.edu.Compass"
+    },
+    {
+      "State": "Started",
+      "Name": "sfsapps.em.wsu.edu.LineManager"
+    },
+    {
+      "State": "Started",
+      "Name": "sfsapps.em.wsu.edu.RSP"
+    },
+    {
+      "State": "Started",
+      "Name": "sfspartners.em.wsu.edu"
+    },
+    {
+      "State": "Started",
+      "Name": "sfspartners.em.wsu.edu.SARAS"
+    },
+    {
+      "State": "Started",
+      "Name": "sfspartners.em.wsu.edu.WSAF"
+    },
+    {
+      "State": "Started",
+      "Name": "sso.em.wsu.edu"
+    },
+    {
+      "State": "Started",
+      "Name": "testpool01.em.wsu.edu"
+    },
+    {
+      "State": "Started",
+      "Name": "testpool02.em.wsu.edu"
+    },
+    {
+      "State": "Started",
+      "Name": "texting.em.wsu.edu"
+    },
+    {
+      "State": "Started",
+      "Name": "touchpoints.em.wsu.edu"
+    },
+    {
+      "State": "Started",
+      "Name": "trussel.em.wsu.edu"
+    },
+    {
+      "State": "Started",
+      "Name": "trussel.em.wsu.edu.Builder"
+    },
+    {
+      "State": "Started",
+      "Name": "trusselbuilder.com"
+    },
+    {
+      "State": "Started",
+      "Name": "webservices.em.wsu.edu"
+    },
+    {
+      "State": "Started",
+      "Name": "webservices.em.wsu.edu.CRMGateway"
+    },
+    {
+      "State": "Started",
+      "Name": "webservices.em.wsu.edu.MailRelay"
+    },
+    {
+      "State": "Started",
+      "Name": "webservices.em.wsu.edu.Teamworks"
+    },
+    {
+      "State": "Started",
+      "Name": "webservices.em.wsu.edu.Workday"
+    },
+    {
+      "State": "Started",
+      "Name": "www.ronet.wsu.edu"
+    },
+    {
+      "State": "Started",
+      "Name": "www.ronet.wsu.edu.CommonApps"
+    }
+  ],
+  "Sites": [
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:academiccalendarpetitions.em.wsu.edu"
+        }
+      ],
+      "Name": "academiccalendarpetitions.em.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\Octopus\\Applications\\AzureProd\\AcademicCalendarPetitions.Release.VSTS\\1.0.0.6134",
+          "IsVirtual": false,
+          "AppPool": "EM-AcademicCalendarPetitions",
+          "Path": "/",
+          "RootSite": "academiccalendarpetitions.em.wsu.edu",
+          "WebConfigLastModified": "2024-05-28T18:36:20.276Z"
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:athleticeligibility.wsu.edu"
+        }
+      ],
+      "Name": "athleticeligibility.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\Octopus\\Applications\\AzureProd\\AthleticEligibility.VSTS\\1.0.6350",
+          "IsVirtual": false,
+          "AppPool": "athleticeligibility.wsu.edu",
+          "Path": "/",
+          "RootSite": "athleticeligibility.wsu.edu",
+          "WebConfigLastModified": "2024-08-06T13:47:58.000Z"
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:cancel.wsu.edu"
+        }
+      ],
+      "Name": "cancel.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\Registrar\\Cancel",
+          "IsVirtual": false,
+          "AppPool": "cancel.wsu.edu",
+          "Path": "/",
+          "RootSite": "cancel.wsu.edu",
+          "WebConfigLastModified": null
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:catalog.wsu.edu"
+        }
+      ],
+      "Name": "catalog.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\Octopus\\Applications\\AzureProd\\Catalog.Release.VSTS\\1.0.1.7589",
+          "IsVirtual": false,
+          "AppPool": "catalog.wsu.edu",
+          "Path": "/",
+          "RootSite": "catalog.wsu.edu",
+          "WebConfigLastModified": "2025-01-13T23:04:59.307Z"
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:CommencementRegistration.em.wsu.edu"
+        }
+      ],
+      "Name": "CommencementRegistration.em.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\Octopus\\Applications\\AzureProd\\CommencementRegistration.Web.VSTS\\1.0.7466",
+          "IsVirtual": false,
+          "AppPool": "CommencementRegistration.em.wsu.edu",
+          "Path": "/",
+          "RootSite": "CommencementRegistration.em.wsu.edu",
+          "WebConfigLastModified": "2025-01-10T01:10:47.822Z"
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:"
+        }
+      ],
+      "Name": "Default Web Site",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\Default",
+          "IsVirtual": false,
+          "AppPool": "DefaultAppPool",
+          "Path": "/",
+          "RootSite": "Default Web Site",
+          "WebConfigLastModified": "2023-11-20T18:10:21.498Z"
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:fax.em.wsu.edu"
+        }
+      ],
+      "Name": "fax.em.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\Octopus\\Applications\\AzureProd\\FAX.Web.VSTS\\1.0.6347_1",
+          "IsVirtual": false,
+          "AppPool": "fax.em.wsu.edu",
+          "Path": "/",
+          "RootSite": "fax.em.wsu.edu",
+          "WebConfigLastModified": "2024-07-29T19:19:53.068Z"
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:flex.em.wsu.edu"
+        }
+      ],
+      "Name": "flex.em.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\Octopus\\Applications\\AzureProd\\FlexCRM.VSTS\\1.0.6789",
+          "IsVirtual": false,
+          "AppPool": "flex.em.wsu.edu",
+          "Path": "/",
+          "RootSite": "flex.em.wsu.edu",
+          "WebConfigLastModified": "2024-12-12T07:49:56.688Z"
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:forms.em.wsu.edu"
+        }
+      ],
+      "Name": "forms.em.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\Octopus\\Applications\\AzureProd\\FreeForm.Web.VSTS\\1.0.6738",
+          "IsVirtual": false,
+          "AppPool": "forms.em.wsu.edu",
+          "Path": "/",
+          "RootSite": "forms.em.wsu.edu",
+          "WebConfigLastModified": "2024-11-04T19:33:53.599Z"
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:Goto.wsu.edu"
+        }
+      ],
+      "Name": "Goto.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\Octopus\\Applications\\AzureProd\\GoTo.Web.VSTS\\1.0.6339",
+          "IsVirtual": false,
+          "AppPool": "Goto.wsu.edu",
+          "Path": "/",
+          "RootSite": "Goto.wsu.edu",
+          "WebConfigLastModified": "2024-07-29T18:42:15.512Z"
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:help.em.wsu.edu"
+        }
+      ],
+      "Name": "help.em.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\Octopus\\Applications\\AzureProd\\HelpDesk.Web.VSTS\\1.0.6814",
+          "IsVirtual": false,
+          "AppPool": "help.em.wsu.edu",
+          "Path": "/",
+          "RootSite": "help.em.wsu.edu",
+          "WebConfigLastModified": "2024-12-04T17:49:54.000Z"
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:mailprocessor.em.wsu.edu"
+        }
+      ],
+      "Name": "mailprocessor.em.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\EIT\\MailProcessor",
+          "IsVirtual": false,
+          "AppPool": "mailprocessor.em.wsu.edu",
+          "Path": "/",
+          "RootSite": "mailprocessor.em.wsu.edu",
+          "WebConfigLastModified": "2024-09-23T16:46:30.494Z"
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:Prod.em.wsu.edu"
+        }
+      ],
+      "Name": "Prod.em.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\EIT\\Prod",
+          "IsVirtual": false,
+          "AppPool": "Prod.em.wsu.edu",
+          "Path": "/",
+          "RootSite": "Prod.em.wsu.edu",
+          "WebConfigLastModified": "2024-11-26T17:46:17.333Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\Octopus\\Applications\\AzureProd\\Credentials.VSTS\\1.0.6147",
+          "IsVirtual": true,
+          "AppPool": "Prod.em.wsu.edu.Credentials",
+          "Path": "/Credentials",
+          "RootSite": "Prod.em.wsu.edu",
+          "WebConfigLastModified": "2024-06-03T15:31:06.000Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\Octopus\\Applications\\AzureProd\\Orientation.Web.VSTS\\1.0.6343",
+          "IsVirtual": true,
+          "AppPool": "Prod.em.wsu.edu.Orientation",
+          "Path": "/Orientation",
+          "RootSite": "Prod.em.wsu.edu",
+          "WebConfigLastModified": "2024-07-29T18:50:42.000Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\Octopus\\Applications\\AzureProd\\Tasks.Web.VSTS\\1.0.6858",
+          "IsVirtual": true,
+          "AppPool": "prod.em.wsu.edu.Tasks",
+          "Path": "/Tasks",
+          "RootSite": "Prod.em.wsu.edu",
+          "WebConfigLastModified": "2024-12-16T16:08:06.000Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\Octopus\\Applications\\AzureProd\\DependencyManager.VSTS\\1.0.6606",
+          "IsVirtual": true,
+          "AppPool": "Prod.em.wsu.edu.Dependencies",
+          "Path": "/Dependencies",
+          "RootSite": "Prod.em.wsu.edu",
+          "WebConfigLastModified": "2024-10-08T16:41:04.000Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\Octopus\\Applications\\AzureProd\\SAP.Web.VSTS\\1.0.8049",
+          "IsVirtual": true,
+          "AppPool": "Prod.em.wsu.edu.SAP",
+          "Path": "/SAP",
+          "RootSite": "Prod.em.wsu.edu",
+          "WebConfigLastModified": "2025-01-29T01:08:39.096Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusProd\\azagentprod\\Applications\\Prod\\Flex4\\1.20250131.18_2",
+          "IsVirtual": true,
+          "AppPool": "prod.em.wsu.edu.Flex",
+          "Path": "/Flex",
+          "RootSite": "Prod.em.wsu.edu",
+          "WebConfigLastModified": null
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\Octopus\\Applications\\AzureProd\\WSU.EIT.HelloWorld.Api.VSTS\\1.0.6823",
+          "IsVirtual": true,
+          "AppPool": "prod.em.wsu.edu.Hello",
+          "Path": "/Hello",
+          "RootSite": "Prod.em.wsu.edu",
+          "WebConfigLastModified": "2024-12-04T21:26:31.809Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\MaintenanceOutage",
+          "IsVirtual": true,
+          "AppPool": "Prod.em.wsu.edu.WSAF",
+          "Path": "/WSAF",
+          "RootSite": "Prod.em.wsu.edu",
+          "WebConfigLastModified": "2023-11-20T20:04:28.407Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\Octopus\\Applications\\AzureProd\\EIT.Touchoints.DataApi.VSTS\\1.0.6883",
+          "IsVirtual": true,
+          "AppPool": "prod.em.wsu.edu.TouchPointsData",
+          "Path": "/TouchPointsData",
+          "RootSite": "Prod.em.wsu.edu",
+          "WebConfigLastModified": "2024-12-18T00:49:24.806Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\Octopus\\azagentprod\\Applications\\Prod\\Flex4\\1.20250203.2_1",
+          "IsVirtual": true,
+          "AppPool": "prod.em.wsu.edu.Flex",
+          "Path": "/prod",
+          "RootSite": "Prod.em.wsu.edu",
+          "WebConfigLastModified": "2025-02-03T19:15:10.000Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\Octopus\\azagentprod\\Applications\\Prod\\Touchpoints\\1.20250203.5_1",
+          "IsVirtual": true,
+          "AppPool": "prod.em.wsu.edu.Touchpoints",
+          "Path": "/Touchpoints",
+          "RootSite": "Prod.em.wsu.edu",
+          "WebConfigLastModified": "2025-02-04T10:22:00.000Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\MaintenanceOutage",
+          "IsVirtual": true,
+          "AppPool": "Prod.em.wsu.edu.screenshotexe",
+          "Path": "/screenshotexe",
+          "RootSite": "Prod.em.wsu.edu",
+          "WebConfigLastModified": "2023-11-20T20:04:28.407Z"
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:purchasing.em.wsu.edu"
+        }
+      ],
+      "Name": "purchasing.em.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\Octopus\\Applications\\AzureProd\\PurchaseTracker.VSTS\\1.0.6751",
+          "IsVirtual": false,
+          "AppPool": "purchasing.em.wsu.edu",
+          "Path": "/",
+          "RootSite": "purchasing.em.wsu.edu",
+          "WebConfigLastModified": "2024-11-15T16:44:22.000Z"
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:schedules.wsu.edu"
+        }
+      ],
+      "Name": "schedules.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\Octopus\\Applications\\AzureProd\\SOC.Web.VSTS\\1.0.6841",
+          "IsVirtual": false,
+          "AppPool": "schedules.wsu.edu",
+          "Path": "/",
+          "RootSite": "schedules.wsu.edu",
+          "WebConfigLastModified": "2024-12-12T20:14:45.580Z"
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:servicecontracts.em.wsu.edu"
+        }
+      ],
+      "Name": "servicecontracts.em.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\EIT\\ServiceContracts",
+          "IsVirtual": false,
+          "AppPool": "servicecontracts.em.wsu.edu",
+          "Path": "/",
+          "RootSite": "servicecontracts.em.wsu.edu",
+          "WebConfigLastModified": "2023-12-20T16:06:47.416Z"
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:sfsapps.em.wsu.edu"
+        }
+      ],
+      "Name": "sfsapps.em.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\SFS\\SFSApps",
+          "IsVirtual": false,
+          "AppPool": "sfsapps.em.wsu.edu",
+          "Path": "/",
+          "RootSite": "sfsapps.em.wsu.edu",
+          "WebConfigLastModified": null
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\SFS\\SFSApps\\Compass",
+          "IsVirtual": true,
+          "AppPool": "sfsapps.em.wsu.edu.Compass",
+          "Path": "/Compass",
+          "RootSite": "sfsapps.em.wsu.edu",
+          "WebConfigLastModified": "2024-04-18T21:23:15.226Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\SFS\\SFSApps\\LineManager",
+          "IsVirtual": true,
+          "AppPool": "sfsapps.em.wsu.edu.LineManager",
+          "Path": "/LineManager",
+          "RootSite": "sfsapps.em.wsu.edu",
+          "WebConfigLastModified": null
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\SFS\\SFSApps\\RSP",
+          "IsVirtual": true,
+          "AppPool": "sfsapps.em.wsu.edu.RSP",
+          "Path": "/RSP",
+          "RootSite": "sfsapps.em.wsu.edu",
+          "WebConfigLastModified": null
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:sfspartners.em.wsu.edu"
+        }
+      ],
+      "Name": "sfspartners.em.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\SFS\\SFSPartners",
+          "IsVirtual": false,
+          "AppPool": "sfspartners.em.wsu.edu",
+          "Path": "/",
+          "RootSite": "sfspartners.em.wsu.edu",
+          "WebConfigLastModified": "2018-05-01T16:00:39.733Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\SFS\\SFSPartners\\SARAS",
+          "IsVirtual": true,
+          "AppPool": "sfspartners.em.wsu.edu.SARAS",
+          "Path": "/SARAS",
+          "RootSite": "sfspartners.em.wsu.edu",
+          "WebConfigLastModified": "2024-10-17T14:49:42.876Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\SFS\\SFSPartners\\WSAF",
+          "IsVirtual": true,
+          "AppPool": "sfspartners.em.wsu.edu.WSAF",
+          "Path": "/WSAF",
+          "RootSite": "sfspartners.em.wsu.edu",
+          "WebConfigLastModified": "2024-07-16T21:47:07.640Z"
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:sso.em.wsu.edu"
+        }
+      ],
+      "Name": "sso.em.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\Octopus\\Applications\\AzureProd\\SSO.VSTS\\1.0.7785",
+          "IsVirtual": false,
+          "AppPool": "sso.em.wsu.edu",
+          "Path": "/",
+          "RootSite": "sso.em.wsu.edu",
+          "WebConfigLastModified": "2025-01-21T17:39:52.000Z"
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:testpool01.em.wsu.edu"
+        }
+      ],
+      "Name": "testpool01.em.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\TestPool01",
+          "IsVirtual": false,
+          "AppPool": "testpool01.em.wsu.edu",
+          "Path": "/",
+          "RootSite": "testpool01.em.wsu.edu",
+          "WebConfigLastModified": "2024-08-19T13:40:21.490Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\Octopus\\Applications\\AzureProd\\Orientation.Web.VSTS\\1.0.4741",
+          "IsVirtual": true,
+          "AppPool": "EM-Prod.em.wsu.edu.Orientation",
+          "Path": "/Orientation",
+          "RootSite": "testpool01.em.wsu.edu",
+          "WebConfigLastModified": null
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\Octopus\\Applications\\AzureProd\\Credentials.Web.VSTS\\1.0.5201",
+          "IsVirtual": true,
+          "AppPool": "EM-Prod.em.wsu.edu.Credentials",
+          "Path": "/Credentials",
+          "RootSite": "testpool01.em.wsu.edu",
+          "WebConfigLastModified": null
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:testpool02.em.wsu.edu"
+        }
+      ],
+      "Name": "testpool02.em.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\TestPool02",
+          "IsVirtual": false,
+          "AppPool": "testpool02.em.wsu.edu",
+          "Path": "/",
+          "RootSite": "testpool02.em.wsu.edu",
+          "WebConfigLastModified": "2024-08-16T20:23:37.807Z"
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:texting.em.wsu.edu"
+        }
+      ],
+      "Name": "texting.em.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\EIT\\Texting",
+          "IsVirtual": false,
+          "AppPool": "texting.em.wsu.edu",
+          "Path": "/",
+          "RootSite": "texting.em.wsu.edu",
+          "WebConfigLastModified": "2023-12-06T16:32:22.989Z"
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:touchpoints.em.wsu.edu"
+        }
+      ],
+      "Name": "touchpoints.em.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\Octopus\\Applications\\AzureProd\\TouchPoints.Web.VSTS\\1.0.6321",
+          "IsVirtual": false,
+          "AppPool": "touchpoints.em.wsu.edu",
+          "Path": "/",
+          "RootSite": "touchpoints.em.wsu.edu",
+          "WebConfigLastModified": "2024-07-25T21:48:28.108Z"
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:trussel.em.wsu.edu"
+        }
+      ],
+      "Name": "trussel.em.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\EIT\\Trussel",
+          "IsVirtual": false,
+          "AppPool": "trussel.em.wsu.edu",
+          "Path": "/",
+          "RootSite": "trussel.em.wsu.edu",
+          "WebConfigLastModified": null
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\Octopus\\Applications\\AzureProd\\Trussel.Web.VSTS\\1.0.6385",
+          "IsVirtual": true,
+          "AppPool": "trussel.em.wsu.edu.Builder",
+          "Path": "/Builder",
+          "RootSite": "trussel.em.wsu.edu",
+          "WebConfigLastModified": "2024-08-13T16:32:51.491Z"
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:trusselbuilder.com"
+        }
+      ],
+      "Name": "trusselbuilder.com",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\Octopus\\Applications\\AzureProdCustomers\\Trussel.Web.VSTS\\1.0.6385",
+          "IsVirtual": false,
+          "AppPool": "trusselbuilder.com",
+          "Path": "/",
+          "RootSite": "trusselbuilder.com",
+          "WebConfigLastModified": "2024-08-13T16:46:24.859Z"
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:webservices.em.wsu.edu"
+        }
+      ],
+      "Name": "webservices.em.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\EIT\\webservices.em.wsu.edu\\RootSite",
+          "IsVirtual": false,
+          "AppPool": "webservices.em.wsu.edu",
+          "Path": "/",
+          "RootSite": "webservices.em.wsu.edu",
+          "WebConfigLastModified": "2024-07-29T18:19:42.000Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\EIT\\webservices.em.wsu.edu\\CRMGateway",
+          "IsVirtual": true,
+          "AppPool": "webservices.em.wsu.edu.CRMGateway",
+          "Path": "/CRMGateway",
+          "RootSite": "webservices.em.wsu.edu",
+          "WebConfigLastModified": "2024-02-15T20:59:12.504Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\EIT\\webservices.em.wsu.edu\\MailRelay",
+          "IsVirtual": true,
+          "AppPool": "webservices.em.wsu.edu.MailRelay",
+          "Path": "/MailRelay",
+          "RootSite": "webservices.em.wsu.edu",
+          "WebConfigLastModified": "2024-02-15T21:00:06.803Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\EIT\\webservices.em.wsu.edu\\Teamworks",
+          "IsVirtual": true,
+          "AppPool": "webservices.em.wsu.edu.Teamworks",
+          "Path": "/Teamworks",
+          "RootSite": "webservices.em.wsu.edu",
+          "WebConfigLastModified": "2018-07-05T18:34:06.589Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\EIT\\webservices.em.wsu.edu\\Workday",
+          "IsVirtual": true,
+          "AppPool": "webservices.em.wsu.edu.Workday",
+          "Path": "/Workday",
+          "RootSite": "webservices.em.wsu.edu",
+          "WebConfigLastModified": "2024-04-25T19:41:40.690Z"
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:www.ronet.wsu.edu"
+        }
+      ],
+      "Name": "www.ronet.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\Registrar\\RONet",
+          "IsVirtual": false,
+          "AppPool": "www.ronet.wsu.edu",
+          "Path": "/",
+          "RootSite": "www.ronet.wsu.edu",
+          "WebConfigLastModified": "2024-04-25T03:31:19.826Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\Registrar\\_CommonApps",
+          "IsVirtual": true,
+          "AppPool": "www.ronet.wsu.edu.CommonApps",
+          "Path": "/CommonApps",
+          "RootSite": "www.ronet.wsu.edu",
+          "WebConfigLastModified": null
+        }
+      ]
+    }
+  ]
+}

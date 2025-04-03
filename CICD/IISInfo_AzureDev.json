@@ -1,0 +1,671 @@
+﻿{
+  "ApplicationPools": [
+    {
+      "State": "Started",
+      "Name": ".NET v4.5"
+    },
+    {
+      "State": "Started",
+      "Name": ".NET v4.5 Classic"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.ACPD"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.AthleticEligibility"
+    },
+    {
+      "State": "Started",
+      "Name": "azuredev.em.wsu.edu.Auth"
+    },
+    {
+      "State": "Started",
+      "Name": "azuredev.em.wsu.edu.BlazorSample"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.Catalog"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.CommencementRegistration"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.Compass"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.Credentials"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.Dependencies"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.Fax"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.Flex"
+    },
+    {
+      "State": "Started",
+      "Name": "azuredev.em.wsu.edu.FlexChat"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.FlexDevTest"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.Forms"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.GoToWSU"
+    },
+    {
+      "State": "Stopped",
+      "Name": "azuredev.em.wsu.edu.Hello"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.Help"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.HelpTest"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.MailProcessor"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.Orientation"
+    },
+    {
+      "State": "Started",
+      "Name": "azuredev.em.wsu.edu.Pipelines"
+    },
+    {
+      "State": "Started",
+      "Name": "azuredev.em.wsu.edu.Pulse"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.PurchaseTracker"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.Purchasing"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.SAP"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.ServiceContracts"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.SFSApps"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.SFSApps-Compass"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.SFSPartners"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.SFSPartners-SARAS"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.SFSPartners-WSAF"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.SOC"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.SSO"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.Tasks"
+    },
+    {
+      "State": "Started",
+      "Name": "AzureDev.em.wsu.edu.TouchPoints"
+    },
+    {
+      "State": "Started",
+      "Name": "AzureDev.em.wsu.edu.TouchPointsCRM"
+    },
+    {
+      "State": "Started",
+      "Name": "AzureDev.em.wsu.edu.TouchPointsData"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.Trussel"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.Trussel-Builder"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.WebServices"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.WorkStudy"
+    },
+    {
+      "State": "Started",
+      "Name": "Azuredev.em.wsu.edu.WSAF"
+    },
+    {
+      "State": "Started",
+      "Name": "cmsdev.em.wsu.edu"
+    },
+    {
+      "State": "Started",
+      "Name": "DefaultAppPool"
+    },
+    {
+      "State": "Started",
+      "Name": "EM-Dev.em.wsu.edu.AcademicCalendarPetitions"
+    },
+    {
+      "State": "Started",
+      "Name": "Flex-dev.em.wsu.edu"
+    },
+    {
+      "State": "Started",
+      "Name": "umbracodev.em.wsu.edu"
+    }
+  ],
+  "Sites": [
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:Azuredev.em.wsu.edu"
+        }
+      ],
+      "Name": "Azuredev.em.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\MaintenanceOutage",
+          "IsVirtual": false,
+          "AppPool": "Azuredev.em.wsu.edu",
+          "Path": "/",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2023-11-20T20:04:28.407Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\Applications\\AzureDev\\Tasks.Web.VSTS\\1.0.6858",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.Tasks",
+          "Path": "/Tasks",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2024-12-16T16:08:06.000Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\Applications\\AzureDev\\SOC.Web.VSTS\\1.0.6841",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.SOC",
+          "Path": "/SOC",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2024-12-12T20:12:57.392Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\Applications\\AzureDev\\CommencementRegistration.Web.VSTS\\1.0.7466",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.CommencementRegistration",
+          "Path": "/CommencementRegistration",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2025-01-09T22:30:05.153Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\azagentdev\\Applications\\Dev\\Touchpoints\\1.20250203.5_1",
+          "IsVirtual": true,
+          "AppPool": "azuredev.em.wsu.edu.Touchpoints",
+          "Path": "/TouchPoints",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2025-02-04T10:22:00.000Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\Applications\\AzureDev\\AcademicCalendarPetitions.Debug.VSTS\\1.0.0.5258",
+          "IsVirtual": true,
+          "AppPool": "EM-Dev.em.wsu.edu.AcademicCalendarPetitions",
+          "Path": "/AcademicCalendarPetitions",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": null
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\Applications\\AzureDev\\AcademicCalendarPetitions.Debug.VSTS\\1.0.0.6134",
+          "IsVirtual": true,
+          "AppPool": "EM-Dev.em.wsu.edu.AcademicCalendarPetitions",
+          "Path": "/ACPD",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2024-05-28T18:35:16.650Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\Applications\\AzureDev\\CatalogRewrite.VSTS\\1.0.8206_1",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.Catalog",
+          "Path": "/Catalog",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2025-02-08T00:49:45.456Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\Dev\\SFSApps",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.SFSApps",
+          "Path": "/SFSApps",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": null
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\Dev\\SFSPartners",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.SFSPartners",
+          "Path": "/SFSPartners",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": null
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\Dev\\SFSApps\\Compass",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.SFSApps-Compass",
+          "Path": "/SFSApps-Compass",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2024-04-18T21:23:15.226Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\Dev\\SFSPartners\\SARAS",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.SFSPartners-SARAS",
+          "Path": "/SFSPartners-SARAS",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2024-10-09T18:06:06.397Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\Dev\\SFSPartners\\WSAF",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.SFSPartners-WSAF",
+          "Path": "/SFSPartners-WSAF",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2024-07-16T21:47:07.640Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\azagentdev\\Applications\\Dev\\FlexCRM\\1.20250124.1_1",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.Flex",
+          "Path": "/Flex",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": null
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\Applications\\AzureDev\\AthleticEligibility.VSTS\\1.0.6350",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.AthleticEligibility",
+          "Path": "/AthleticEligibility",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2024-08-06T13:47:58.000Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\Dev\\EIT\\MailProcessor",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.MailProcessor",
+          "Path": "/MailProcessor",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2024-01-05T15:49:11.420Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\MaintenanceOutage",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.Purchasing",
+          "Path": "/Purchasing",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2023-11-20T20:04:28.407Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\Applications\\AzureDev\\SSO.VSTS\\1.0.7785",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.SSO",
+          "Path": "/SSO",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2025-01-21T17:39:52.000Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\Dev\\EIT\\WebServices\\RootSite",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.WebServices",
+          "Path": "/WebServices",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2024-07-29T18:19:42.079Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\Applications\\AzureDev\\Trussel.Web.VSTS\\1.0.6385",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.Trussel-Builder",
+          "Path": "/Trussel-Builder",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2024-08-13T16:28:45.433Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\Dev\\EIT\\Trussel",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.Trussel",
+          "Path": "/Trussel",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": null
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\Applications\\AzureDev\\FAX.Web.VSTS\\1.0.6347_1",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.Fax",
+          "Path": "/Fax",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2024-07-29T19:18:09.707Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\Applications\\AzureDev\\FreeForm.Web.VSTS\\1.0.6738",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.Forms",
+          "Path": "/Forms",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2024-11-04T19:32:39.228Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\Applications\\AzureDev\\GoTo.Web.VSTS\\1.0.6339",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.GoToWSU",
+          "Path": "/GoToWSU",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2024-07-29T18:40:31.391Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\Applications\\AzureDev\\HelpDesk.Web.VSTS\\1.0.6814",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.Help",
+          "Path": "/Help",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2024-12-04T17:49:54.000Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\Applications\\AzureDev\\Credentials.VSTS\\1.0.6800",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.Credentials",
+          "Path": "/Credentials",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2024-11-26T21:11:28.000Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\Applications\\AzureDev\\Orientation.Web.VSTS\\1.0.6343",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.Orientation",
+          "Path": "/Orientation",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2024-07-29T18:50:42.000Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\Applications\\AzureDev\\PurchaseTracker.VSTS\\1.0.6751",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.PurchaseTracker",
+          "Path": "/PurchaseTracker",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2024-11-15T16:44:22.000Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\Applications\\AzureDev\\RoNet.Web.VSTS\\1.0.3862",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu",
+          "Path": "/RONet",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2022-07-28T18:14:37.653Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\Applications\\AzureDev\\SAP.Web.VSTS\\1.0.8049",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.SAP",
+          "Path": "/SAP",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2025-01-28T22:40:05.879Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\Applications\\AzureDev\\BlazorSample.VSTS\\1.0.6135",
+          "IsVirtual": true,
+          "AppPool": "azuredev.em.wsu.edu.BlazorSample",
+          "Path": "/BlazorSample",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2024-05-28T19:34:16.000Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\Applications\\AzureDev\\Pulse.VSTS\\1.0.5915",
+          "IsVirtual": true,
+          "AppPool": "azuredev.em.wsu.edu.Pulse",
+          "Path": "/Pulse",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2024-03-29T16:47:27.588Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\Applications\\AzureDev\\ServiceContracts.VSTS\\1.0.5883",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.ServiceContracts",
+          "Path": "/ServiceContracts",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2024-03-14T20:59:01.526Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\Applications\\AzureDev\\DependencyManager.VSTS\\1.0.6606",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.Dependencies",
+          "Path": "/Dependencies",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2024-10-08T16:41:04.000Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\Applications\\AzureDev\\FlexChat.VSTS\\1.0.6256",
+          "IsVirtual": true,
+          "AppPool": "azuredev.em.wsu.edu.FlexChat",
+          "Path": "/FlexChat",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2024-07-23T00:10:36.000Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\Dev\\SFSPartners\\SARAS",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.SFSPartners-SARAS",
+          "Path": "/SFSPartners/SARAS",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2024-10-09T18:06:06.397Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\Dev\\SFSPartners\\WSAF",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.SFSPartners-WSAF",
+          "Path": "/SFSPartners/WSAF",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2024-07-16T21:47:07.640Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\Applications\\AzureDev\\FlexCRM.DANIEL\\1.0.6574",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.FlexDevTest",
+          "Path": "/FlexTest",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2024-09-25T20:34:02.440Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\Dev\\SFSApps\\Compass",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.Compass",
+          "Path": "/Compass",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2024-04-18T21:23:15.226Z"
+        },
+        {
+          "PhysicalPath": "C:/WebRoot/OctopusDev/azagentdev/Applications/Dev/Sample/1.20250122.15_1",
+          "IsVirtual": true,
+          "AppPool": "azuredev.em.wsu.edu.Hello",
+          "Path": "/Hello",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": null
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\Applications\\AzureDev\\WSU.EIT.AuthApi.VSTS\\1.0.6847",
+          "IsVirtual": true,
+          "AppPool": "azuredev.em.wsu.edu.Auth",
+          "Path": "/Auth",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2024-12-13T01:53:27.186Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\Applications\\AzureDev\\WorkStudy.Web.VSTS\\1.0.8064",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.WSAF",
+          "Path": "/WSAF",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2025-01-30T23:44:32.247Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\Applications\\AzureDev\\WSU.EIT.Touchpoints.DataApi.VSTS\\1.20250118.258",
+          "IsVirtual": true,
+          "AppPool": "AzureDev.em.wsu.edu.TouchPointsData",
+          "Path": "/TouchPointsData",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2025-01-18T10:06:59.419Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\azagentdev\\Applications\\Dev\\Touchpoints\\1.20250124.3_1",
+          "IsVirtual": true,
+          "AppPool": "azuredev.em.wsu.edu.TouchpointsCRM",
+          "Path": "/TouchPointsCRM",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2025-01-24T18:04:40.000Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\Applications\\AzureDev\\CatalogRewrite.VSTS\\1.0.8206",
+          "IsVirtual": true,
+          "AppPool": "Azuredev.em.wsu.edu.Catalog",
+          "Path": "/CatalogRewrite",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2025-02-08T00:49:24.053Z"
+        },
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\azagentdev\\Applications\\DEV\\Pipelines\\1.20250210.2_2",
+          "IsVirtual": true,
+          "AppPool": "azuredev.em.wsu.edu.Pipelines",
+          "Path": "/Pipelines",
+          "RootSite": "Azuredev.em.wsu.edu",
+          "WebConfigLastModified": "2025-02-10T22:02:56.000Z"
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:cmsdev.em.wsu.edu"
+        }
+      ],
+      "Name": "cmsdev.em.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\Applications\\AzureDev\\Umbraco13.VSTS\\1.0.6812_2",
+          "IsVirtual": false,
+          "AppPool": "cmsdev.em.wsu.edu",
+          "Path": "/",
+          "RootSite": "cmsdev.em.wsu.edu",
+          "WebConfigLastModified": "2024-11-27T20:50:06.000Z"
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:"
+        }
+      ],
+      "Name": "Default Web Site",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\Default",
+          "IsVirtual": false,
+          "AppPool": "DefaultAppPool",
+          "Path": "/",
+          "RootSite": "Default Web Site",
+          "WebConfigLastModified": "2023-11-20T18:10:21.498Z"
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:flex-dev.em.wsu.edu"
+        }
+      ],
+      "Name": "Flex-dev.em.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\azagentdev\\Applications\\DEV\\Flex\\1.20250205.1_1",
+          "IsVirtual": false,
+          "AppPool": "Flex-dev.em.wsu.edu",
+          "Path": "/",
+          "RootSite": "Flex-dev.em.wsu.edu",
+          "WebConfigLastModified": "2025-02-06T00:34:52.000Z"
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:umbracodev.em.wsu.edu"
+        }
+      ],
+      "Name": "umbracodev.em.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusDev\\azagentdev\\Applications\\DEV\\Umbraco15\\1.20250207.12_1",
+          "IsVirtual": false,
+          "AppPool": "umbracodev.em.wsu.edu",
+          "Path": "/",
+          "RootSite": "umbracodev.em.wsu.edu",
+          "WebConfigLastModified": "2025-02-07T22:35:46.000Z"
+        }
+      ]
+    }
+  ]
+}

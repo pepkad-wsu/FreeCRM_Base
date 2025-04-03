@@ -1,0 +1,1123 @@
+﻿@page "/devops"
+@page "/{TenantCode}/devops"
+@using System.Text.Json
+@inject BlazorDataModel Model
+@inject HttpClient Http
+@inject IJSRuntime JS
+@inject NavigationManager NavManager
+
+@implements IDisposable
+
+<!-- Inline CSS for wizard styling -->
+<style>
+    .wizard-tab-content {
+    margin-top: 20px;
+    }
+
+    .wizard-navigation {
+    margin-bottom: 20px;
+    }
+
+    .disabled-tab {
+    pointer-events: none;
+    opacity: 0.5;
+    }
+
+    .card-footer {
+    background-color: #f8f9fa;
+    }
+
+    .editor-container {
+    height: calc(100vh - 300px);
+    border: 1px solid #ddd;
+    overflow: auto;
+    padding: 10px;
+    background-color: #f8f9fa;
+    }
+
+    .nav-tabs .nav-link.active {
+    font-weight: bold;
+    }
+
+    .card-header span.version-label {
+    font-size: 0.9rem;
+    color: #555;
+    }
+</style>
+
+<!-- Loading indicator -->
+@if (IsLoading)
+{
+    <div class="d-flex justify-content-center my-3">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+
+@if (!IsLoading && Model.Loaded && Model.View == _pageName)
+{
+
+   
+
+}
+
+<!-- IIS Info Section (visible only for App Admins) -->
+@if (Model?.User != null && Model.User.AppAdmin)
+{
+    <hr />
+    <h3>IIS Information</h3>
+    @if (IsLoadingIIS)
+    {
+        <div>Loading IIS Info...</div>
+    }
+    else if (IisInfoData == null || IisInfoData.Count == 0)
+    {
+        <div>No IIS Info data available.</div>
+    }
+    else
+    {
+        <ul class="nav nav-tabs" role="tablist">
+            @foreach (var key in IisInfoData.Keys)
+            {
+                <li class="nav-item" role="presentation">
+                    <button class=@("nav-link " + (SelectedIisTab == key ? "active" : ""))
+                            @onclick="() => OnTabChanged(key)"
+                            type="button">
+                        @key
+                    </button>
+                </li>
+            }
+        </ul>
+        <div class="tab-content mt-3">
+            @foreach (var kvp in IisInfoData)
+            {
+                <div class=@("tab-pane " + (SelectedIisTab == kvp.Key ? "active" : "d-none"))>
+                    <button class="btn btn-sm btn-secondary mb-2" @onclick="() => ToggleIisExpandView(kvp.Key)">
+                        @(IsJsonExpanded.ContainsKey(kvp.Key) && IsJsonExpanded[kvp.Key] ? "Collapse" : "Expand")
+                    </button>
+                    <div class="json-container" style="background-color: #f8f9fa; padding: 10px; border: 1px solid #ddd; border-radius: 4px; @(IsJsonExpanded.ContainsKey(kvp.Key) && IsJsonExpanded[kvp.Key] ? "" : "max-height: 400px; overflow-y: auto;")">
+                        <pre>@JsonSerializer.Serialize(kvp.Value, new JsonSerializerOptions { WriteIndented = true })</pre>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+}
+
+@code {
+    private Dictionary<string, DataObjects.VariableGroupEditState> variableGroupStates = new();
+
+    // New property for .csproj file selection
+    protected string SelectedCsprojPath { get; set; } = "";
+
+    // Monaco Editor reference for the YAML editor
+    private MonacoEditor _monacoEditorDevOps = null!;
+
+    protected string _monacoContent = "";
+    protected string _monacoContentToDiff = "";
+    protected bool _monacoReadOnly = false;
+
+    // ========================================================
+    // Azure DevOps Integration Properties
+    // ========================================================
+    protected string Organization { get; set; } = "wsueit";
+    protected DataObjects.DevopsOrgInfo? WsuEitOrgInfo { get; set; }
+    protected bool IsLoading { get; set; } = true;
+    protected bool IsLoadingIIS { get; set; } = true;
+
+    // ========================================================
+    // IIS Information Section Properties
+    // ========================================================
+    protected Dictionary<string, DataObjects.IISInfo?>? IisInfoData { get; set; }
+    protected string SelectedIisTab { get; set; } = "AzureDev";
+
+    // ========================================================
+    // Selections for DevOps Projects, Repositories, and Branches
+    // ========================================================
+    protected string SelectedProjectId { get; set; } = "";
+    protected DataObjects.DevopsProjectInfo? SelectedProjectInfo => WsuEitOrgInfo?.Projects.FirstOrDefault(p => p.ProjectId == SelectedProjectId);
+    protected string SelectedRepoId { get; set; } = "";
+    protected DataObjects.DevopsGitRepoInfo? SelectedRepoInfo => SelectedProjectInfo?.GitRepos.FirstOrDefault(r => r.RepoId == SelectedRepoId);
+    protected string SelectedBranch { get; set; } = "";
+    protected DataObjects.DevopsGitRepoBranchInfo? SelectedBranchInfo => SelectedRepoInfo?.GitBranches.FirstOrDefault(r => r.BranchName == SelectedBranch);
+    protected Dictionary<string, DataObjects.DevopsVariableGroup> SelectedEnviornmentVariableGroups { get; set; } = new();
+
+    // ========================================================
+    // Pipeline Data Properties
+    // ========================================================
+    protected List<DataObjects.DevopsPipelineDefinition> ReleasePipelinesList { get; set; } = new List<DataObjects.DevopsPipelineDefinition>();
+    protected int SelectedPipelineId { get; set; } = 0;
+    protected DataObjects.DevopsPipelineDefinition? SelectedPipelineInfo => ReleasePipelinesList?.FirstOrDefault(p => p.Id == SelectedPipelineId);
+    protected string ExistingYamlContent { get; set; } = "";
+    private string NewVariableGroupName = "";
+    private string NewVariableGroupDescription = "";
+    private string NewVariableGroupVariablesJson = "{}";
+
+    // Properties for new variable group creation:
+    List<DataObjects.DevopsVariable> NewVariables { get; set; } = new List<DataObjects.DevopsVariable>();
+
+    // Property for editing an existing variable group:
+    DataObjects.DevopsVariableGroup EditingVariableGroup { get; set; } = new DataObjects.DevopsVariableGroup { Variables = new List<DataObjects.DevopsVariable>() };
+
+    void AddVariable()
+    {
+        NewVariables.Add(new DataObjects.DevopsVariable());
+        StateHasChanged();
+    }
+
+    void RemoveVariable(DataObjects.DevopsVariable variable)
+    {
+        NewVariables.Remove(variable);
+        StateHasChanged();
+    }
+
+    void AddEditingVariable()
+    {
+        if (EditingVariableGroup.Variables == null)
+        {
+            EditingVariableGroup.Variables = new List<DataObjects.DevopsVariable>();
+        }
+        EditingVariableGroup.Variables.Add(new DataObjects.DevopsVariable());
+        StateHasChanged();
+    }
+
+    void RemoveEditingVariable(DataObjects.DevopsVariable variable)
+    {
+        EditingVariableGroup.Variables.Remove(variable);
+        StateHasChanged();
+    }
+
+    void OnVariableGroupChanged(DataObjects.EnvSetting env, ChangeEventArgs e)
+    {
+        // When the dropdown changes, update the env's VariableGroupName.
+        string selected = e.Value?.ToString() ?? "";
+        env.VariableGroupName = selected;
+        if (!string.IsNullOrEmpty(selected))
+        {
+            // Load the existing group for editing
+            EditingVariableGroup = WsuEitOrgInfo?.DevopsVariableGroups.FirstOrDefault(v => v.Name == selected)
+                                    ?? new DataObjects.DevopsVariableGroup { Name = selected, Variables = new List<DataObjects.DevopsVariable>() };
+        }
+        else
+        {
+            // If no group is selected, clear the editing group.
+            EditingVariableGroup = new DataObjects.DevopsVariableGroup { Variables = new List<DataObjects.DevopsVariable>() };
+        }
+        StateHasChanged();
+    }
+
+    async Task CreateNewVariableGroup(DataObjects.EnvSetting env)
+    {
+        try
+        {
+            var newGroup = new DataObjects.DevopsVariableGroup
+                {
+                    Name = NewVariableGroupName,
+                    Description = NewVariableGroupDescription,
+                    Variables = NewVariables
+                };
+
+            var response = await Http.PostAsJsonAsync(DataObjects.Endpoints.ReleasePipelines.CreateVariableGroup, newGroup);
+            if (response.IsSuccessStatusCode)
+            {
+                var createdGroup = await response.Content.ReadFromJsonAsync<DataObjects.DevopsVariableGroup>();
+                if (WsuEitOrgInfo != null && createdGroup != null)
+                {
+                    WsuEitOrgInfo.DevopsVariableGroups.Add(createdGroup);
+                }
+                // Set the env's variable group to the newly created group.
+                env.VariableGroupName = createdGroup?.Name;
+                // Clear the creation fields.
+                NewVariableGroupName = "";
+                NewVariableGroupDescription = "";
+                NewVariables.Clear();
+                Model.Message_Saved("Variable group created successfully.");
+            }
+            else
+            {
+                Model.ErrorMessages(new List<string> { "Error creating variable group: " + await response.Content.ReadAsStringAsync() });
+            }
+        }
+        catch (Exception ex)
+        {
+            Model.ErrorMessages(new List<string> { "Exception in CreateNewVariableGroup: " + ex.Message });
+        }
+        StateHasChanged();
+    }
+
+    async Task SaveEditedVariableGroup()
+    {
+        try
+        {
+            // Post the updated group to the API for saving.
+            var response = await Http.PostAsJsonAsync(DataObjects.Endpoints.ReleasePipelines.UpdateVariableGroup, EditingVariableGroup);
+            if (response.IsSuccessStatusCode)
+            {
+                var updatedGroup = await response.Content.ReadFromJsonAsync<DataObjects.DevopsVariableGroup>();
+                if (updatedGroup != null)
+                {
+                    // Update the list in your global DevOps org info.
+                    var index = WsuEitOrgInfo.DevopsVariableGroups.FindIndex(v => v.Id == updatedGroup.Id);
+                    if (index >= 0)
+                    {
+                        WsuEitOrgInfo.DevopsVariableGroups[index] = updatedGroup;
+                    }
+                    Model.Message_Saved("Variable group updated successfully.");
+                }
+            }
+            else
+            {
+                Model.ErrorMessages(new List<string> { "Failed to update variable group: " + await response.Content.ReadAsStringAsync() });
+            }
+        }
+        catch (Exception ex)
+        {
+            Model.ErrorMessages(new List<string> { "Error updating variable group: " + ex.Message });
+        }
+        StateHasChanged();
+    }
+
+    async Task OnPipelineChanged(ChangeEventArgs e)
+    {
+        try
+        {
+            if (int.TryParse(e.Value?.ToString(), out int pid))
+            {
+                SelectedPipelineId = pid;
+                var pipeline = ReleasePipelinesList.FirstOrDefault(p => p.Id == SelectedPipelineId);
+                if (pipeline != null && !string.IsNullOrEmpty(pipeline.YamlFileName))
+                {
+                    await LoadReleasePipelineYaml(pipeline.YamlFileName);
+                }
+                else
+                {
+                    SelectedPipelineId = 0;
+                    ExistingYamlContent = "";
+                    EditableYamlContent = "";
+                }
+            }
+            else
+            {
+                SelectedPipelineId = 0;
+                ExistingYamlContent = "";
+                EditableYamlContent = "";
+            }
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error in OnPipelineChanged: " + ex.Message);
+        }
+    }
+
+    private async Task LoadReleasePipelinesAsync()
+    {
+        try
+        {
+            ReleasePipelinesList = await Http.GetFromJsonAsync<List<DataObjects.DevopsPipelineDefinition>>(DataObjects.Endpoints.ReleasePipelines.GetPipelines)
+                            ?? new List<DataObjects.DevopsPipelineDefinition>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error loading release pipelines: " + ex.Message);
+        }
+
+    }
+
+    private async Task LoadReleasePipelineYaml(string filePath)
+    {
+        try
+        {
+            ExistingYamlContent = await Http.GetStringAsync(DataObjects.Endpoints.ReleasePipelines.GetYmlFileContent + "?filePath=" + Uri.EscapeDataString(filePath));
+            EditableYamlContent = ExistingYamlContent;
+            // Update the Monaco editor with the loaded content
+            if (_monacoEditorDevOps != null)
+            {
+                await _monacoEditorDevOps.SetValue(EditableYamlContent);
+            }
+            Console.WriteLine("Loaded pipeline YAML successfully.");
+        }
+        catch (Exception ex)
+        {
+            ExistingYamlContent = "";
+            EditableYamlContent = "";
+            Console.WriteLine("Error loading pipeline YAML: " + ex.Message);
+        }
+        StateHasChanged();
+    }
+
+    // ========================================================
+    // New Pipeline Creation UI State & Methods
+    // ========================================================
+    private string NewPipelineName = "";
+    private bool IsCreatingPipelineLoading = false;
+
+    protected async Task SubmitNewPipeline()
+    {
+        // Clear any previous messages
+        Model.ClearMessages();
+
+        // Validate required fields
+        if (string.IsNullOrWhiteSpace(NewPipelineName))
+        {
+            Model.ErrorMessages(new List<string> { "Pipeline name is required." });
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(SelectedProjectId) || string.IsNullOrWhiteSpace(SelectedRepoId) || string.IsNullOrWhiteSpace(SelectedBranch))
+        {
+            Model.ErrorMessages(new List<string> { "Project, repository and branch must be selected before creating a pipeline." });
+            return;
+        }
+
+        try
+        {
+            IsCreatingPipelineLoading = true;
+            var projectName = SelectedProjectInfo.ProjectName.Replace(" ", "");
+            var request = new DataObjects.PipelineCreationRequest
+                {
+                    Name = NewPipelineName,
+                    ProjectName = projectName,
+                    ProjectId = SelectedProjectId,
+                    RepositoryId = SelectedRepoId,
+                    DefaultBranch = SelectedBranch,
+                    YamlFilePath = $"/projects/{projectName}/" + NewPipelineName.Replace(" ", "") + ".yml"
+                };
+
+            // Indicate that the creation is in progress.
+            Model.Message_Saving("Creating pipeline...");
+
+            var response = await Http.PostAsJsonAsync(DataObjects.Endpoints.ReleasePipelines.CreatePipeline, request);
+
+            // Clear saving message once API call is complete.
+            Model.ClearMessages();
+
+            if (response.IsSuccessStatusCode)
+            {
+                var createdPipeline = await response.Content.ReadFromJsonAsync<DataObjects.BuildDefinition>();
+                await LoadReleasePipelinesAsync();
+                if (createdPipeline != null)
+                {
+                    SelectedPipelineId = createdPipeline.Id;
+                    await OnPipelineChanged(new ChangeEventArgs { Value = createdPipeline.Id.ToString() });
+                }
+                Model.Message_Saved("Pipeline created successfully.");
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                Model.ErrorMessages(new List<string> { "Error creating pipeline: " + error });
+            }
+        }
+        catch (Exception ex)
+        {
+            Model.ErrorMessages(new List<string> { "Exception creating pipeline: " + ex.Message });
+        }
+        finally
+        {
+            IsCreatingPipelineLoading = false;
+            StateHasChanged();
+        }
+    }
+
+
+    // ========================================================
+    // IIS Settings Dropdown Selections
+    // ========================================================
+    protected string SelectedWebsite { get; set; } = "";
+    protected string SelectedServerType { get; set; } = "Development";
+    protected string SelectedVirtualPath { get; set; } = "";
+    protected string SelectedAppPool { get; set; } = "";
+
+    // ========================================================
+    // Event Handlers for Project, Repo, and Branch Selection
+    // ========================================================
+    void OnProjectChanged(ChangeEventArgs e)
+    {
+        try
+        {
+            SelectedProjectId = e.Value?.ToString() ?? "";
+            SelectedRepoId = "";
+            SelectedBranch = "";
+            BuildPipelineDictionary["CODE_PROJECT_NAME"] = SelectedProjectInfo?.ProjectName ?? "";
+            VariablesFileDictionary["CI_ProjectName"] = SelectedProjectInfo?.ProjectName ?? "";
+            EnviornmentVariableGroupDictionary["DEV"] = $"{SelectedProjectInfo?.ProjectName}_AppSettings_DEV";
+            EnviornmentVariableGroupDictionary["PROD"] = $"{SelectedProjectInfo?.ProjectName}_AppSettings_PROD";
+            EnviornmentVariableGroupDictionary["CMS"] = $"{SelectedProjectInfo?.ProjectName}_AppSettings_CMS";
+            Console.WriteLine("Project changed: " + SelectedProjectId);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error in OnProjectChanged: " + ex.Message);
+        }
+    }
+
+    void OnRepoChanged(ChangeEventArgs e)
+    {
+        try
+        {
+            SelectedRepoId = e.Value?.ToString() ?? "";
+            SelectedBranch = "";
+            BuildPipelineDictionary["CODE_REPO_NAME"] = SelectedRepoInfo?.RepoName ?? "";
+            Console.WriteLine("Repository changed: " + SelectedRepoId);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error in OnRepoChanged: " + ex.Message);
+        }
+    }
+
+    void OnBranchChanged(ChangeEventArgs e)
+    {
+        try
+        {
+            SelectedBranch = e.Value?.ToString() ?? "";
+            BuildPipelineDictionary["CODE_REPO_BRANCH"] = SelectedBranch;
+            Console.WriteLine("Branch changed: " + SelectedBranch);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error in OnBranchChanged: " + ex.Message);
+        }
+    }
+
+    // ========================================================
+    // Build Pipeline and Environment Variables Generation
+    // ========================================================
+    [Parameter] public string? TenantCode { get; set; }
+    protected string _pageName = "devops";
+    protected bool _loadedData = false;
+    protected bool _loading = false;
+
+    protected Dictionary<string, string> VariablesFileDictionary = new Dictionary<string, string>
+    {
+        { "CI_ProjectName", "" },
+        { "CI_BUILD_CsProjectPath", "" },
+        { "CI_BUILD_Namespace", "" }
+    };
+
+    protected Dictionary<string, string> BuildPipelineDictionary = new Dictionary<string, string>
+    {
+        { "CODE_PROJECT_NAME", "" },
+        { "CODE_REPO_NAME", "" },
+        { "CODE_REPO_BRANCH", "" }
+    };
+
+    protected Dictionary<string, string> EnviornmentVariableGroupDictionary = new Dictionary<string, string>
+    {
+        { "DEV", "" },
+        { "PROD", "" },
+        { "CMS", "" }
+    };
+
+    protected string buildPipelineTemplate = @"
+# build-and-deploy-pipeline.yml
+name: '$(Date:yyyyMMdd)$(Rev:.r)'
+
+resources:
+  repositories:
+    - repository: TemplateRepo
+      type: git
+      name: 'ReleasePipelines/ReleasePipelines'
+      ref: 'refs/heads/main'
+      trigger: none
+    - repository: BuildRepo
+      type: git
+      name: '{{CODE_PROJECT_NAME}}/{{CODE_REPO_NAME}}'
+      ref: 'refs/heads/{{CODE_REPO_BRANCH}}'
+      trigger:
+        branches:
+          include:
+            - {{CODE_REPO_BRANCH}}
+
+variables:
+  - template: templates/common-variables.yml@TemplateRepo
+
+{{PIPELINE_VARIABLES}}
+
+pool:
+  name: 'BuildVM'
+
+stages:
+  ####################################################################
+  # 0. Pre-Build Stage
+  ####################################################################
+  - stage: PreBuildStage
+    displayName: ""Pre-Build Stage""
+    jobs:
+      - job: PreBuildJob
+        workspace:
+          clean: all
+        displayName: ""Dump Environment Variables""
+        steps:
+          - checkout: none
+          - download: none
+          - template: templates/dump-env-variables-template.yml@TemplateRepo
+
+  # -------------------------------------------------------------------
+  # Build Stage: pass the runtime variables to the build template
+  # -------------------------------------------------------------------
+  - stage: BuildStage
+    displayName: ""Build Stage""
+    jobs:
+      - job: BuildJob
+        displayName: ""Build and Publish Application""
+        pool:
+          name: 'BuildVM'
+        steps:
+          - template: templates/build-template.yml@TemplateRepo
+            parameters:
+              buildProjectName: ""$(CI_ProjectName)""
+              buildCsProjectPath: ""$(CI_BUILD_CsProjectPath)""
+              buildPublishArgs: ""$(CI_PIPELINE_COMMON_PublishArgs)""
+              buildNamespace: ""$(CI_BUILD_Namespace)""
+
+  # -------------------------------------------------------------------
+  # Info Stage: Basic information (env dump, etc.)
+  # -------------------------------------------------------------------
+  - stage: InfoStage
+    displayName: ""Info Stage""
+    jobs:
+      - job: InfoJob
+        displayName: ""Info Job""
+        pool:
+          name: 'BuildVM'
+        steps:
+          - checkout: none
+          - download: none
+          - task: PowerShell@2
+            displayName: ""Just a filler step""
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host ""Hello World""
+
+{{DEPLOY_STAGES}}";
+
+    string GeneratePipelineVariablesBlock()
+    {
+        var sb = new System.Text.StringBuilder();
+        foreach (var kv in VariablesFileDictionary)
+        {
+            sb.AppendLine($"  - name: {kv.Key}");
+            sb.AppendLine($"    value: \"{kv.Value}\"");
+        }
+        sb.Append(GenerateEnvVariablesBlock());
+        return sb.ToString();
+    }
+
+    string GenerateEnvVariablesBlock()
+    {
+        var sb = new System.Text.StringBuilder();
+        foreach (var env in EnvSettingsList)
+        {
+            var envKey = env.EnvName.ToUpper();
+            sb.AppendLine($"  - name: CI_{envKey}_IISDeploymentType");
+            sb.AppendLine($"    value: \"{env.IISDeploymentType}\"");
+            sb.AppendLine($"  - name: CI_{envKey}_WebsiteName");
+            sb.AppendLine($"    value: \"{env.WebsiteName}\"");
+            sb.AppendLine($"  - name: CI_{envKey}_VirtualPath");
+            sb.AppendLine($"    value: \"{env.VirtualPath}\"");
+            sb.AppendLine($"  - name: CI_{envKey}_AppPoolName");
+            sb.AppendLine($"    value: \"{env.AppPoolName}\"");
+            sb.AppendLine($"  - name: CI_{envKey}_VariableGroup");
+            sb.AppendLine($"    value: \"{env.VariableGroupName}\"");
+            if (!string.IsNullOrWhiteSpace(env.BindingInfo))
+            {
+                sb.AppendLine($"  - name: CI_{envKey}_BindingInfo");
+                sb.AppendLine($"    value: >");
+                sb.AppendLine($"      {env.BindingInfo}");
+            }
+        }
+        return sb.ToString();
+    }
+
+    string GenerateDeployStages()
+    {
+        var sb = new System.Text.StringBuilder();
+        foreach (var env in EnvSettingsList)
+        {
+            string azureEnv = env.ServerType.Equals("Production", StringComparison.OrdinalIgnoreCase)
+                                ? "AzureProd"
+                                : env.ServerType.Equals("CMS", StringComparison.OrdinalIgnoreCase)
+                                    ? "AzureCMS"
+                                    : "AzureDev";
+            string basePath = azureEnv switch
+            {
+                "AzureProd" => "$(CI_PIPELINE_COMMON_ApplicationFolder_PROD)",
+                "AzureCMS" => "$(CI_PIPELINE_COMMON_ApplicationFolder_CMS)",
+                _ => "$(CI_PIPELINE_COMMON_ApplicationFolder_DEV)"
+            };
+            string dotNetVersion = azureEnv switch
+            {
+                "AzureProd" => "$(CI_PIPELINE_COMMON_DotNetVersion_PROD)",
+                _ => "$(CI_PIPELINE_COMMON_DotNetVersion_DEV)"
+            };
+            string appPoolIdentity = azureEnv switch
+            {
+                "AzureProd" => "$(CI_PIPELINE_COMMON_AppPoolIdentity_PROD)",
+                _ => "$(CI_PIPELINE_COMMON_AppPoolIdentity_DEV)"
+            };
+            var envKey = env.EnvName.ToUpper();
+
+            sb.AppendLine($"  - stage: Deploy{env.EnvName}Stage");
+            sb.AppendLine($"    displayName: \"Deploy to {env.EnvName}\"");
+            sb.AppendLine($"    dependsOn: InfoStage");
+            sb.AppendLine($"    variables:");
+            sb.AppendLine($"      - group: ${{{{ variables.CI_{envKey}_VariableGroup }}}}");
+            sb.AppendLine($"    jobs:");
+            sb.AppendLine($"      - deployment: Deploy{env.EnvName}");
+            sb.AppendLine($"        workspace:");
+            sb.AppendLine($"          clean: all");
+            sb.AppendLine($"        displayName: \"Deploy to {env.EnvName} (Environment-based)\"");
+            sb.AppendLine($"        environment:");
+            sb.AppendLine($"          name: \"{azureEnv}\"");
+            sb.AppendLine($"          resourceType: \"VirtualMachine\"");
+            sb.AppendLine($"        strategy:");
+            sb.AppendLine($"          runOnce:");
+            sb.AppendLine($"            deploy:");
+            sb.AppendLine($"              steps:");
+            sb.AppendLine($"                - checkout: none");
+            sb.AppendLine($"                - template: templates/dump-env-variables-template.yml@TemplateRepo");
+            sb.AppendLine($"                - template: templates/deploy-template.yml@TemplateRepo");
+            sb.AppendLine($"                  parameters:");
+            sb.AppendLine($"                    envFolderName: \"{env.EnvName}\"");
+            sb.AppendLine($"                    basePath: \"{basePath}\"");
+            sb.AppendLine($"                    projectName: \"$(CI_ProjectName)\"");
+            sb.AppendLine($"                    releaseRetention: \"$(CI_PIPELINE_COMMON_ReleaseRetention)\"");
+            sb.AppendLine($"                    IISDeploymentType: \"$(CI_{envKey}_IISDeploymentType)\"");
+            sb.AppendLine($"                    WebsiteName: \"$(CI_{envKey}_WebsiteName)\"");
+            sb.AppendLine($"                    VirtualPath: \"$(CI_{envKey}_VirtualPath)\"");
+            sb.AppendLine($"                    AppPoolName: \"$(CI_{envKey}_AppPoolName)\"");
+            sb.AppendLine($"                    DotNetVersion: \"{dotNetVersion}\"");
+            sb.AppendLine($"                    AppPoolIdentity: \"{appPoolIdentity}\"");
+            if (!string.IsNullOrWhiteSpace(env.BindingInfo))
+            {
+                sb.AppendLine($"                    CustomBindings: \"$(CI_{envKey}_BindingInfo)\"");
+            }
+            sb.AppendLine($"                - template: templates/clean-workspace-template.yml@TemplateRepo");
+            sb.AppendLine();
+        }
+        return sb.ToString();
+    }
+
+    private string YamlContent = "";
+
+    string GetProcessedBuildPipelineFile()
+    {
+        var processed = ProcessTemplate(buildPipelineTemplate, BuildPipelineDictionary);
+        processed = processed.Replace("{{DEPLOY_STAGES}}", GenerateDeployStages());
+        processed = processed.Replace("{{PIPELINE_VARIABLES}}", GeneratePipelineVariablesBlock());
+        return processed;
+    }
+
+    string ProcessTemplate(string template, Dictionary<string, string> replacements)
+    {
+        var processed = template;
+        foreach (var kv in replacements)
+        {
+            processed = processed.Replace("{{" + kv.Key + "}}", kv.Value);
+        }
+        return processed;
+    }
+
+    async Task CopyYmlToClipboard()
+    {
+        try
+        {
+            var content = GetProcessedBuildPipelineFile();
+            await JS.InvokeVoidAsync("CopyToClipboard", content);
+            Console.WriteLine("Copied new YAML to clipboard.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error copying YAML to clipboard: " + ex.Message);
+        }
+    }
+
+    protected List<DataObjects.EnvSetting> EnvSettingsList = new List<DataObjects.EnvSetting>
+    {
+    };
+
+    // ========================================================
+    // Additional Properties for YAML Editing and Versioning
+    // ========================================================
+    protected string EditableYamlContent { get; set; } = "";
+    protected string SaveStatusMessage { get; set; } = "";
+
+    protected async Task SaveYamlChanges()
+    {
+        // Clear any previous messages
+        Model.ClearMessages();
+        try
+        {
+            // Update the YAML content from the Monaco editor before saving.
+            if (_monacoEditorDevOps != null)
+            {
+                EditableYamlContent = await _monacoEditorDevOps.GetValue();
+            }
+            if (string.IsNullOrWhiteSpace(EditableYamlContent))
+            {
+                Model.ErrorMessages(new List<string> { "YAML content is empty, nothing to save." });
+                return;
+            }
+            var pipeline = ReleasePipelinesList.FirstOrDefault(p => p.Id == SelectedPipelineId);
+            if (pipeline == null || string.IsNullOrWhiteSpace(pipeline.YamlFileName))
+            {
+                Model.ErrorMessages(new List<string> { "No pipeline selected or YAML file path is missing." });
+                return;
+            }
+
+            // Notify user that save is in progress.
+            Model.Message_Saving();
+
+            // Send the updated YAML content to the API
+            var response = await Http.PostAsJsonAsync(
+                DataObjects.Endpoints.ReleasePipelines.UpdateYmlFile + "?filePath=" + Uri.EscapeDataString(pipeline.YamlFileName),
+                EditableYamlContent);
+
+            // Clear the saving message
+            Model.ClearMessages();
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Update the saved content locally
+                ExistingYamlContent = EditableYamlContent;
+                // Inform the user of success.
+                Model.Message_Saved("YAML file updated successfully.");
+            }
+            else
+            {
+                var errorText = "Failed to update YAML file: " + await response.Content.ReadAsStringAsync();
+                Model.ErrorMessages(new List<string> { errorText });
+            }
+        }
+        catch (Exception ex)
+        {
+            Model.ErrorMessages(new List<string> { "Error while saving YAML: " + ex.Message });
+        }
+    }
+
+
+    // ========================================================
+    // IIS Info and Tab Handlers
+    // ========================================================
+    void ToggleIisExpandView(string key)
+    {
+        if (IsJsonExpanded.ContainsKey(key))
+        {
+            IsJsonExpanded[key] = !IsJsonExpanded[key];
+        }
+        else
+        {
+            IsJsonExpanded[key] = true;
+        }
+    }
+
+    Dictionary<string, bool> IsJsonExpanded = new Dictionary<string, bool>();
+
+    void OnTabChanged(string tabName)
+    {
+        SelectedIisTab = tabName;
+    }
+
+    int EnvColumnWidth => EnvSettingsList.Count > 0 ? (12 / EnvSettingsList.Count) : 12;
+
+    void AddEnv()
+    {
+        EnvSettingsList.Add(new DataObjects.EnvSetting { EnvName = "NEW", IISDeploymentType = "IISWebApplication", WebsiteName = "", VirtualPath = "", AppPoolName = "", ServerType = "Development", VariableGroupName = "" });
+        StateHasChanged();
+    }
+
+    void RemoveEnv(int index)
+    {
+        if (index < 0 || index >= EnvSettingsList.Count) return;
+        EnvSettingsList.RemoveAt(index);
+        StateHasChanged();
+    }
+
+    void MoveEnvUp(int index)
+    {
+        if (index <= 0 || index >= EnvSettingsList.Count) return;
+        var temp = EnvSettingsList[index - 1];
+        EnvSettingsList[index - 1] = EnvSettingsList[index];
+        EnvSettingsList[index] = temp;
+        StateHasChanged();
+    }
+
+    void MoveEnvDown(int index)
+    {
+        if (index < 0 || index >= EnvSettingsList.Count - 1) return;
+        var temp = EnvSettingsList[index + 1];
+        EnvSettingsList[index + 1] = EnvSettingsList[index];
+        EnvSettingsList[index] = temp;
+        StateHasChanged();
+    }
+
+    void OnIISDeploymentTypeChanged(ChangeEventArgs e, DataObjects.EnvSetting env)
+    {
+        env.IISDeploymentType = e.Value?.ToString() ?? "";
+        if (env.IISDeploymentType == "IISWebsite")
+        {
+            env.VirtualPath = "";
+        }
+        StateHasChanged();
+    }
+
+    // ========================================================
+    // Lifecycle Methods and Model Subscription
+    // ========================================================
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Model.TenantCodeFromUrl = TenantCode;
+            Model.OnChange += OnDataModelUpdated;
+        }
+        if (Model.Loaded)
+        {
+            if (Model.LoggedIn)
+            {
+                if (!_loadedData)
+                {
+                    _loadedData = true;
+                    await Helpers.ValidateUrl(TenantCode, true);
+                    var iisInfoTask = LoadIisInfoAsync();
+                    var devopsInfoTask = LoadDevopsInfoAsync();
+                    var releasePipelineTask = LoadReleasePipelinesAsync();
+
+                    // await all tasks
+                    await Task.WhenAll([iisInfoTask, devopsInfoTask, releasePipelineTask]);
+
+                    IsLoading = false;
+
+                    StateHasChanged();
+                }
+            }
+            else
+            {
+                Helpers.NavigateTo("Login");
+            }
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        if (!Model.Subscribers_OnChange.Contains(_pageName))
+        {
+            Model.Subscribers_OnChange.Add(_pageName);
+            Model.OnChange += OnDataModelUpdated;
+        }
+        Model.View = _pageName;
+    }
+
+    protected void OnDataModelUpdated()
+    {
+        if (Model.View == _pageName)
+        {
+            StateHasChanged();
+        }
+    }
+
+    public void Dispose()
+    {
+        Model.OnChange -= OnDataModelUpdated;
+        Model.Subscribers_OnChange.Remove(_pageName);
+    }
+
+    protected string LogoUrl
+    {
+        get
+        {
+            string output = "";
+            if (Model.Tenant.TenantSettings.Logo.HasValue && Model.Tenant.TenantSettings.Logo != Guid.Empty)
+            {
+                output = Model.ApplicationUrl + "File/View/" + ((Guid)Model.Tenant.TenantSettings.Logo).ToString();
+            }
+            return output;
+        }
+    }
+
+    private async Task LoadIisInfoAsync()
+    {
+        try
+        {
+            IisInfoData = await Helpers.GetOrPost<Dictionary<string, DataObjects.IISInfo?>>(DataObjects.Endpoints.DevOps.GetIISInfo);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error loading IIS Info: " + ex.Message);
+        }
+    }
+
+    private async Task LoadDevopsInfoAsync()
+    {
+        int attempts = 0;
+        while (attempts < 10)
+        {
+            try
+            {
+                IsLoading = true;
+                WsuEitOrgInfo = await Http.GetFromJsonAsync<DataObjects.DevopsOrgInfo>(DataObjects.Endpoints.DevOps.GetWsuEitOrgInfo);
+                if (WsuEitOrgInfo != null && WsuEitOrgInfo.Projects != null && WsuEitOrgInfo.Projects.Any())
+                {
+                    Console.WriteLine("Loaded DevOps Info successfully.");
+                    break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading DevOps Info: {ex.Message}");
+            }
+
+            attempts++;
+            await Task.Delay(3000);
+        }
+    }
+
+    // ========================================================
+    // Input Handling for Global Variables and Build Pipeline
+    // ========================================================
+    void OnVariablesFileChanged(string key, ChangeEventArgs e)
+    {
+        VariablesFileDictionary[key] = e.Value?.ToString() ?? "";
+        StateHasChanged();
+    }
+
+    void OnBuildPipelineChanged(string key, ChangeEventArgs e)
+    {
+        BuildPipelineDictionary[key] = e.Value?.ToString() ?? "";
+        StateHasChanged();
+    }
+
+
+    #region Wizard Navigation and Mechanics
+
+    // Wizard state and step names
+    private int currentStep = 0;
+    private string[] StepNames = new string[]
+    {
+    "Select Project",
+    "Select Repository",
+    "Select Branch",
+    "Pipeline Selection",
+    "Select .csproj File",
+    "Environment Settings",
+    "Variable Group Details",
+    "YAML Preview & Save"
+    };
+
+    // Navigation methods
+    private void NavigateToStep(int stepIndex)
+    {
+        // Allow backward navigation, but prevent forward jumps
+        if (stepIndex <= currentStep)
+        {
+            currentStep = stepIndex;
+            StateHasChanged();
+        }
+    }
+
+    private void NextStep()
+    {
+        if (currentStep < StepNames.Length - 1)
+        {
+            currentStep++;
+            StateHasChanged();
+        }
+    }
+
+    private void PrevStep()
+    {
+        if (currentStep > 0)
+        {
+            currentStep--;
+            StateHasChanged();
+        }
+    }
+
+    // Event handler wrappers for wizard selections that call the existing methods.
+    private void ProjectChangedWizard(ChangeEventArgs e)
+    {
+        OnProjectChanged(e);
+    }
+
+    private void RepoChangedWizard(ChangeEventArgs e)
+    {
+        OnRepoChanged(e);
+    }
+
+    private void BranchChangedWizard(ChangeEventArgs e)
+    {
+        OnBranchChanged(e);
+    }
+
+    private async Task PipelineChangedWizard(ChangeEventArgs e)
+    {
+        await OnPipelineChanged(e);
+    }
+
+    // Environment selection state used in the UI (for checkboxes)
+    private Dictionary<string, bool> envEnabled = new Dictionary<string, bool>
+    {
+        { "DEV", false },
+        { "PROD", false },
+        { "CMS", false }
+    };
+
+    // Helper to get (or create) an environment settings instance
+    private DataObjects.EnvSetting GetEnvSetting(string envKey)
+    {
+        var setting = EnvSettingsList.FirstOrDefault(e => e.EnvName.Equals(envKey, StringComparison.OrdinalIgnoreCase));
+        if (setting == null)
+        {
+
+            var dev = "azuredev.em.wsu.edu";
+            var prod = "prod.em.wsu.edu";
+            var cms = "cms.em.wsu.edu";
+            var websiteNameDefault = "";
+            switch (envKey)
+            {
+                case "DEV":
+                    websiteNameDefault = dev;
+                    break;
+                case "PROD":
+                    websiteNameDefault = prod;
+                    break;
+                case "CMS":
+                    websiteNameDefault = cms;
+                    break;
+                default:
+                    break;
+            }
+
+            setting = new DataObjects.EnvSetting
+                {
+                    EnvName = envKey,
+                    IISDeploymentType = "IISWebApplication",
+                    WebsiteName = "" + websiteNameDefault,
+                    VirtualPath = "/" + SelectedProjectInfo?.ProjectName?.ToLower(),
+                    AppPoolName = "" + websiteNameDefault + "." + SelectedProjectInfo?.ProjectName?.ToLower(),
+                    VariableGroupName = SelectedProjectInfo?.ProjectName?.ToLower().Replace(" ", "") + "_appsettings_" + envKey
+                };
+
+            if (string.IsNullOrWhiteSpace(setting.VirtualPath))
+                if (string.IsNullOrWhiteSpace(setting.VariableGroupName))
+                {
+                    setting.VariableGroupName = string.Empty + SelectedProjectInfo?.ProjectName + "_appsettings_" + envKey;
+                }
+            EnvSettingsList.Add(setting);
+        }
+        return setting;
+    }
+
+    // Invokes the variable group creation for a specific environment
+    private async Task CreateVariableGroupForEnv(string envKey)
+    {
+        var env = GetEnvSetting(envKey);
+        await CreateNewVariableGroup(env);
+    }
+
+    #endregion
+
+}

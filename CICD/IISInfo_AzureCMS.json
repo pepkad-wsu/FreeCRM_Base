@@ -1,0 +1,146 @@
+﻿{
+  "ApplicationPools": [
+    {
+      "State": "Started",
+      "Name": ".NET v4.5"
+    },
+    {
+      "State": "Started",
+      "Name": ".NET v4.5 Classic"
+    },
+    {
+      "State": "Started",
+      "Name": "cms.em.wsu.edu"
+    },
+    {
+      "State": "Started",
+      "Name": "CMSProd.em.wsu.edu"
+    },
+    {
+      "State": "Started",
+      "Name": "DefaultAppPool"
+    },
+    {
+      "State": "Started",
+      "Name": "umbraco.em.wsu.edu"
+    },
+    {
+      "State": "Started",
+      "Name": "UmbracoNext.em.wsu.edu"
+    }
+  ],
+  "Sites": [
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "10.147.168.20:80:"
+        },
+        {
+          "certificateStoreName": "My",
+          "protocol": "https",
+          "certificateHash": "6DEF2228EC33510433AD9F66D5FB5CB41ADB0BE0",
+          "bindingInformation": "10.147.168.20:443:"
+        }
+      ],
+      "Name": "cms.em.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusCMS\\Applications\\AzureUmbraco\\Umbraco13.VSTS\\1.0.6812_1",
+          "IsVirtual": false,
+          "AppPool": "cms.em.wsu.edu",
+          "Path": "/",
+          "RootSite": "cms.em.wsu.edu",
+          "WebConfigLastModified": "2024-11-27T20:50:06.000Z"
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:*"
+        }
+      ],
+      "Name": "cmsprod.em.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusCMS\\Applications\\AzureUmbraco\\Umbraco13.VSTS\\1.0.5995",
+          "IsVirtual": false,
+          "AppPool": "CMSProd.em.wsu.edu",
+          "Path": "/",
+          "RootSite": "cmsprod.em.wsu.edu",
+          "WebConfigLastModified": null
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "*:80:"
+        }
+      ],
+      "Name": "Default Web Site",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\Default",
+          "IsVirtual": false,
+          "AppPool": "DefaultAppPool",
+          "Path": "/",
+          "RootSite": "Default Web Site",
+          "WebConfigLastModified": "2023-11-20T18:10:21.498Z"
+        }
+      ]
+    },
+    {
+      "Bindings": [
+
+      ],
+      "Name": "umbraco.em.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\OctopusCMS\\azagentcms\\Applications\\CMS\\Umbraco15\\1.20250207.12_1",
+          "IsVirtual": false,
+          "AppPool": "umbraco.em.wsu.edu",
+          "Path": "/",
+          "RootSite": "umbraco.em.wsu.edu",
+          "WebConfigLastModified": "2025-02-07T22:35:46.000Z"
+        }
+      ]
+    },
+    {
+      "Bindings": [
+        {
+          "certificateStoreName": "",
+          "protocol": "http",
+          "certificateHash": null,
+          "bindingInformation": "10.147.168.24:80:"
+        },
+        {
+          "certificateStoreName": "My",
+          "protocol": "https",
+          "certificateHash": "6D874EF0376F202A775067DF625F41C7C93598E6",
+          "bindingInformation": "10.147.168.24:443:"
+        }
+      ],
+      "Name": "UmbracoNext.em.wsu.edu",
+      "Applications": [
+        {
+          "PhysicalPath": "C:\\WebRoot\\MaintenanceOutage",
+          "IsVirtual": false,
+          "AppPool": "UmbracoNext.em.wsu.edu",
+          "Path": "/",
+          "RootSite": "UmbracoNext.em.wsu.edu",
+          "WebConfigLastModified": "2023-11-20T20:04:28.407Z"
+        }
+      ]
+    }
+  ]
+}

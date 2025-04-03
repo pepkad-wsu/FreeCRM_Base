@@ -1,11 +1,11 @@
+using CICD;
 using CICD.Components;
-using CICD.Server.Controllers;
+using CICD.Services;
+using Microsoft.Extensions.Caching.Memory;
+using NuGet.Protocol.Plugins;
+using CICD.Components;
 using CICD.Server.Hubs;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authorization.Infrastructure;
-using Microsoft.AspNetCore.Builder;
+using CICD.Services;
 using System.Security.Claims;
 
 namespace CICD
@@ -20,7 +20,6 @@ namespace CICD
 
             var isDevelopment = builder.Environment.IsDevelopment();
             if (!isDevelopment) {
-                
             }
 
             // Attempts to read the AzureSignalRurl setting from appsettings.json.
@@ -39,14 +38,17 @@ namespace CICD
             builder.Services.AddRazorPages();
             builder.Services.AddHttpContextAccessor();
 
-           
-
             builder.Services.AddSingleton<IServiceProvider>(provider => provider);
 
             string _localModeUrl = String.Empty + builder.Configuration.GetValue<string>("LocalModeUrl");
             string _connectionString = String.Empty + builder.Configuration.GetConnectionString("AppData");
-            builder.Services.AddTransient<IDataAccess>(x => ActivatorUtilities.CreateInstance<DataAccess>(x, _connectionString, _localModeUrl, x.GetRequiredService<IServiceProvider>()));
-
+            builder.Services.AddTransient<IDataAccess>(x => ActivatorUtilities.CreateInstance<DataAccess>(
+                x,
+                _connectionString,
+                _localModeUrl,
+                x.GetRequiredService<IServiceProvider>(),
+                x.GetRequiredService<IMemoryCache>()  // <-- Pass the memory cache instance from DI
+            ));
             var useAuthorization = CustomAuthenticationProviders.UseAuthorization(builder);
             builder.Services.AddTransient<ICustomAuthentication>(x => ActivatorUtilities.CreateInstance<CustomAuthentication>(x, useAuthorization));
 
@@ -63,16 +65,27 @@ namespace CICD
 
             List<string> disabled = new List<string>();
             var globallyDisabledModules = builder.Configuration.GetSection("GloballyDisabledModules").GetChildren();
-            if(globallyDisabledModules != null && globallyDisabledModules.Any()) {
-                foreach(var item in globallyDisabledModules.ToArray().Select(c => c.Value).ToList()) {
+            if (globallyDisabledModules != null && globallyDisabledModules.Any()) {
+                foreach (var item in globallyDisabledModules.ToArray().Select(c => c.Value).ToList()) {
                     if (!String.IsNullOrWhiteSpace(item)) {
                         disabled.Add(item.ToLower());
                     }
                 }
             }
 
+            var pat = builder.Configuration.GetValue<string>("App:AzurePAT");
+            var projectId = builder.Configuration.GetValue<string>("App:AzureProjectId");
+            var repoId = builder.Configuration.GetValue<string>("App:AzureRepoId");
+            var branch = builder.Configuration.GetValue<string>("App:AzureBranch");
+            var orgName = builder.Configuration.GetValue<string>("App:AzureOrgName");
+
             var configurationHelperLoader = new ConfigurationHelperLoader {
+                PAT = pat,
+                ProjectId = projectId,
                 BasePath = basePath,
+                RepoId = repoId,
+                Branch = branch,
+                OrgName = orgName,
                 ConnectionStrings = new ConfigurationHelperConnectionStrings {
                     AppData = builder.Configuration.GetConnectionString("AppData"),
                 },
@@ -87,6 +100,14 @@ namespace CICD
                 options.AddPolicy("PreventPasswordChange", policy => policy.RequireClaim(ClaimTypes.Role, "PreventPasswordChange"));
             });
 
+            builder.Services.AddTransient<IIISInfoProvider, IISInfoProvider>();
+
+            // Add the DevOps pre-caching background service.
+            builder.Services.AddHostedService<CICD.Services.DevopsPrecacheService>();
+
+            // NEW: Add the Files pre-caching background service.
+            builder.Services.AddHostedService<CICD.Services.FilesPrecacheService>();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -99,7 +120,7 @@ namespace CICD
             }
 
             app.UseHttpsRedirection();
-            
+
             //app.UseStaticFiles(); Replaced by the newer MapStaticAssets middleware.
             app.MapStaticAssets();
 

@@ -1210,19 +1210,10 @@
                         }
 
                         if (!allowAnonymousAccess) {
-                            if (!String.IsNullOrWhiteSpace(pagename)) {
-                                if (!allowAnonymousAccess) {
-                                    switch (pagename.ToUpper()) {
-                                        case "ABOUT":
-                                        case "DATABASEOFFLINE":
-                                        case "LOGIN":
-                                        case "LOGOUT":
-                                        case "PROCESSLOGIN":
-                                        case "SETUP":
-                                            allowAnonymousAccess = true;
-                                            break;
-                                    }
-                                }
+                            if(GlobalSettings.App.AnonamousAccessList
+                                .Select(o => string.Empty + o?.ToUpper())
+                                .Contains(string.Empty + pagename?.ToUpper())) {
+                                allowAnonymousAccess = true;
                             }
                         }
 

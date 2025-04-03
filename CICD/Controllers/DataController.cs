@@ -1,6 +1,8 @@
 using CICD.Server.Hubs;
+using CICD.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Caching.Memory;
 using System.Security.Claims;
 
 namespace CICD.Server.Controllers;
@@ -15,6 +17,9 @@ public partial class DataController : ControllerBase
     private Guid TenantId = Guid.Empty;
     private IConfigurationHelper configurationHelper;
 
+    private readonly IMemoryCache _cache;
+    private readonly IIISInfoProvider _iisInfoProvider;
+
     private readonly IHubContext<CICDhub>? _signalR;
 
     private string _fingerprint = "";
@@ -24,12 +29,16 @@ public partial class DataController : ControllerBase
         IHttpContextAccessor httpContextAccessor, 
         ICustomAuthentication auth, 
         IHubContext<CICDhub> hubContext, 
-        IConfigurationHelper configHelper)
+        IConfigurationHelper configHelper,
+        IIISInfoProvider iisInfoProvider,
+        IMemoryCache memoryCache)
     {
         da = daInjection;
         authenticationProviders = auth;
         configurationHelper = configHelper;
         _signalR = hubContext;
+        _iisInfoProvider = iisInfoProvider;
+        _cache = memoryCache; 
 
         if (authenticationProviders != null) {
             da.SetAuthenticationProviders(new DataObjects.AuthenticationProviders { 

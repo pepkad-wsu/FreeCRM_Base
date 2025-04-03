@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\CICD.Client\Pages\Component.razor" Link="Component.razor" />
     <None Include="appsettings.Development.json" />
   </ItemGroup>
 

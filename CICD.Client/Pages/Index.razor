@@ -2,6 +2,7 @@
 @page "/{TenantCode}"
 @inject BlazorDataModel Model
 @implements IDisposable
+@inject HttpClient Http
 
 @if (Model.Loaded && Model.LoggedIn && Model.View == _pageName) {
     if (!String.IsNullOrWhiteSpace(LogoUrl) && Model.Tenant.TenantSettings.LogoIncludedOnHomePage) {
@@ -17,30 +18,250 @@
         <Language Tag="Welcome" ReplaceSpaces="true" /> @Model.User.FirstName
     </h1>
 
-    <div class="mb-2">
-        <a href="@Helpers.BuildUrl("Monaco")" class="btn btn-primary">
-            Monaco Editor Testing
-        </a>
+ <div class="container-fluid">
+        <!-- Wizard Navigation Tabs -->
+        <ul class="nav nav-tabs wizard-navigation">
+            @for (int i = 0; i < StepNames.Length; i++)
+            {
+                <li class="nav-item">
+                    <a class=@("nav-link " + (currentStep == i ? "active" : "") + " " + (i > currentStep ? "disabled-tab" : ""))
+                    style="cursor:pointer"
+                    @onclick="(() => NavigateToStep(i))">
+                        @StepNames[i]
+                    </a>
+                </li>
+            }
+        </ul>
 
-        <a href="@Helpers.BuildUrl("Plugins")" class="btn btn-primary">
-            Plugin Testing
-        </a>
+        <!-- Wizard Step Content -->
+        <div class="wizard-tab-content">
+            @if (currentStep == 0)
+            {
+                <!-- Step 0: Select Project -->
+                <div class="card">
+                    <div class="card-header">Select Project</div>
+                    <div class="card-body">
+                        <label class="form-label">Project:</label>
+                        <select class="form-select" @onchange="ProjectChangedWizard">
+                            <option value="">-- Select Project --</option>
+                            @if (AzureOrgInfo != null)
+                            {
+                                @foreach (var proj in AzureOrgInfo.Projects.OrderBy(o => (string.Empty + o.ProjectName).ToLower()))
+                                {
+                                    <option value="@proj.ProjectId">@proj.ProjectName</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="card-footer text-end">
+                        <button class="btn btn-primary" @onclick="NextStep" disabled="@(string.IsNullOrEmpty(SelectedProjectId))">Next</button>
+                    </div>
+                </div>
+            }
+            else if (currentStep == 1)
+            {
+                <!-- Step 1: Select Repository -->
+                <div class="card">
+                    <div class="card-header">Select Repository</div>
+                    <div class="card-body">
+                        <label class="form-label">Repository:</label>
+                        <select class="form-select" @onchange="RepoChangedWizard">
+                            <option value="">-- Select Repository --</option>
+                            @if (SelectedProjectInfo != null)
+                            {
+                                @foreach (var repo in SelectedProjectInfo.GitRepos.OrderBy(o => (string.Empty + o.RepoName).ToLower()))
+                                {
+                                    <option value="@repo.RepoId">@repo.RepoName</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="card-footer text-end">
+                        <button class="btn btn-secondary me-2" @onclick="PrevStep">Back</button>
+                        <button class="btn btn-primary" @onclick="NextStep" disabled="@(string.IsNullOrEmpty(SelectedRepoId))">Next</button>
+                    </div>
+                </div>
+            }
+            else if (currentStep == 2)
+            {
+                <!-- Step 2: Select Branch -->
+                <div class="card">
+                    <div class="card-header">Select Branch</div>
+                    <div class="card-body">
+                        <label class="form-label">Branch:</label>
+                        <select class="form-select" @onchange="BranchChangedWizard">
+                            <option value="">-- Select Branch --</option>
+                            @if (SelectedRepoInfo != null)
+                            {
+                                @foreach (var branch in SelectedRepoInfo.GitBranches.OrderBy(o => (string.Empty + o.BranchName).ToLower()))
+                                {
+                                    <option value="@branch.BranchName">@branch.BranchName</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="card-footer text-end">
+                        <button class="btn btn-secondary me-2" @onclick="PrevStep">Back</button>
+                        <button class="btn btn-primary" @onclick="NextStep" disabled="@(string.IsNullOrEmpty(SelectedBranch))">Next</button>
+                    </div>
+                </div>
+            }
+             else if (currentStep == 3)
+            {
+                <!-- Step 3: Select .csproj File -->
+                <div class="card">
+                    <div class="card-header">Select .csproj File</div>
+                    <div class="card-body">
+                        @if (SelectedBranchInfo == null || SelectedBranchInfo.FileStructure == null)
+                        {
+                            <p>No file structure available for the selected branch.</p>
+                        }
+                        else
+                        {
+                            var csprojFiles = SelectedBranchInfo.FileStructure.Files
+                            .Where(f => f.FileType.EndsWith(".csproj", StringComparison.OrdinalIgnoreCase))
+                            .ToList();
+                            if (csprojFiles.Count == 0)
+                            {
+                                <p>No .csproj files found in this branch.</p>
+                            }
+                            else
+                            {
+                                <label class="form-label">Choose a .csproj file:</label>
+                                <select class="form-select"  @onchange="CsProjectFileChangedWizard">
+                                    <option value="">-- Select .csproj file --</option>
+                                    @foreach (var file in csprojFiles.OrderBy(f => f.Path))
+                                    {
+                                        <option value="@file.Path">@file.Path</option>
+                                    }
+                                </select>
+                            }
+                        }
+                    </div>
+                    <div class="card-footer text-end">
+                        <button class="btn btn-secondary me-2" @onclick="PrevStep">Back</button>
 
-        <a href="@Helpers.BuildUrl("TimerTest")" class="btn btn-primary">
-            Timer Test Page
-        </a>
+                        <button class="btn btn-primary" @onclick="NextStep">Next</button>
+                    </div>
+                </div>                                                                      
+            } 
+            else if (currentStep == 4)
+            {
+                <!-- Step 4: Environment Settings -->
+                <div class="card">
+                    <div class="card-header">Environment Settings</div>
+                    <div class="card-body">
+                        <p>Select environments to configure (optional):</p>
+                        @foreach (var envKey in GlobalSettings.App.EnvironmentOptions.Keys)
+                        {
+                            <div class="form-check mb-2">
+                                <input type="checkbox" class="form-check-input" id="envCheck_@envKey" @onchange="@(e => EnvironmentChangedWizard(envKey, e))" />
+                                <label class="form-check-label" for="envCheck_@envKey">@envKey Environment</label>
+                            </div>
+                            if (EnvSettings.Keys.Contains(envKey))
+                            {
+                                var envSetting = EnvSettings[envKey];
+                                <div class="border p-2 mb-3">
+                                    <h6>@envKey Environment Settings</h6>
+                                    <label class="form-label">IIS Deployment Type:</label>
+                                    <select class="form-select"@onchange="@(e => EnvironmentDeploymentTypeChangedWizard(envKey, e))">
+                                        <option value="IISWebsite">IISWebsite</option>
+                                        <option value="IISWebApplication">IISWebApplication</option>
+                                    </select>
+                                    <label class="form-label">Website Name:</label>
+                                    <input type="text" class="form-control" @bind="envSetting.WebsiteName" />
+                                    @if(envSetting.IISDeploymentType == "IISWebApplication")
+                                    {
+                                        <label class="form-label">Virtual Path:</label>
+                                        <input type="text" class="form-control" @bind="envSetting.VirtualPath" placeholder="Enter virtual path" />
+                                    }
+                                    <label class="form-label">App Pool Name:</label>
+                                    <input type="text" class="form-control" @bind="envSetting.AppPoolName" />
+                                    <label class="form-label">Variable Group Name:</label>
+                                    <input type="text" class="form-control" @bind="envSetting.VariableGroupName" placeholder="Enter variable group name" />
+                                </div>
+                            }
+                        }
+                    </div>
+                    <div class="card-footer text-end">
+                        <button class="btn btn-secondary me-2" @onclick="PrevStep">Back</button>
+                        <button class="btn btn-primary" @onclick="NextStep">Next</button>
+                    </div>
+                </div>
+            }
+            else if (currentStep == 4)
+            {
+                <!-- Step 4: Pipeline Selection -->
+                <div class="card">
+                    <div class="card-header">Pipeline Selection</div>
+                    <div class="card-body">
+                        <label class="form-label">Select Existing Pipeline:</label>
+                        <select class="form-select" value="@SelectedPipelineId" @onchange="@(e => {PipelineChangedWizard(e); })">
+                            <option value="">-- Select Pipeline or Create New --</option>
+                            @foreach (var group in ReleasePipelinesList.GroupBy(p => p.Path).OrderBy(g => g.Key))
+                            {
+                                <optgroup label="@group.Key">
+                                    @foreach (var pipe in group.OrderBy(p => p.Name))
+                                    {
+                                        <option value="@pipe.Id">@pipe.Name</option>
+                                    }
+                                </optgroup>
+                            }
+                        </select>
 
-        <a href="@Helpers.BuildUrl("SortTest")" class="btn btn-primary">
-            Sort Test Page
-        </a>
 
-        <a href="@Helpers.BuildUrl("DoubleClick")" class="btn btn-primary">
-            Double-Click
-        </a>
+                        @if (SelectedPipelineId <= 0)
+                        {
+                            <div class="mt-3">
+                                <label class="form-label">New Pipeline Name:</label>
+                                <input type="text" class="form-control" @bind="NewPipelineName" placeholder="Enter pipeline name" />
+                            </div>
+                        }
+                        else
+                        {
+                            var pipeline = ReleasePipelinesList.FirstOrDefault(p => p.Id == SelectedPipelineId);
+                            if (pipeline != null)
+                            {
+                                <div class="mt-3">
+                                    <p><strong>Pipeline Name:</strong> @pipeline.Name</p>
+                                    <p><strong>Pipeline Id:</strong> @pipeline.Id</p>
+                                    <p><strong>YML File:</strong> @pipeline.YamlFileName</p>
+                                </div>
+                            }
+                        }
+                    </div>
+                    <div class="card-footer text-end">
+                        <button class="btn btn-secondary me-2" @onclick="PrevStep">Back</button>
+                        <button class="btn btn-primary" @onclick="NextStep" disabled="@(SelectedPipelineId <= 0 && string.IsNullOrWhiteSpace(NewPipelineName))">Next</button>
+                    </div>
+                </div>
+            }
+            else if (currentStep == 6)
+            {
+                <!-- Step 6: YAML Preview & Save -->
+                <div class="card">
+                    <div class="card-header">YAML Preview & Save</div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- After (Generated YAML) Preview -->
+                            <div class="col-md-12">
+                                <h6>After (New Version)</h6>
+                                <pre class="border p-2" style="height:300px; overflow-y: auto;"></pre>
+                            </div>
+                        </div>                        
+                    </div>
+                    <div class="card-footer text-end">
+                        <button class="btn btn-secondary me-2" @onclick="PrevStep">Back</button>
+                        <button class="btn btn-primary" @onclick="SaveYamlChanges">Save YAML Changes</button>
+                    </div>
+                </div>
+            }
+        </div>
     </div>
 
-    <div class="mb-2">Fingerprint: @Model.Fingerprint</div>
 }
+
+@* Page structure code section *@
 @code {
     [Parameter] public string? TenantCode { get; set; }
 
@@ -112,5 +333,582 @@
     protected void TimerExecuted(Object? source, System.Timers.ElapsedEventArgs e)
     {
         Console.WriteLine("Timer Executed");
+    }
+}
+
+
+@* App specific variable definition code section *@
+@code{
+    DataObjects.DevopsOrgInfo? AzureOrgInfo = new ();
+    private int currentStep = 0;
+    private string? SelectedProjectId = string.Empty;
+    private string? SelectedRepoId = string.Empty;
+    private string? SelectedBranch = string.Empty;
+    private string? SelectedCsprojPath = string.Empty;
+    private string? NewPipelineName = string.Empty;
+    private int? SelectedPipelineId;
+    private string YamlContent = string.Empty;
+    private bool IsCreatingPipelineLoading = false;
+
+    
+    // Environment selection state used in the UI (for checkboxes)
+    private Dictionary<string, DataObjects.EnvSetting> EnvSettings = GlobalSettings.App.EnvironmentOptions.Keys.ToDictionary(env => env, env => new DataObjects.EnvSetting()) ?? new Dictionary<string, DataObjects.EnvSetting>();
+
+    private string[] StepNames = ["Select Project", "Select Repository", "Select Branch", "Pipeline Selection", "Select .csproj File", "Environment Settings", "Variable Group Details", "YAML Preview & Save"];
+
+    protected DataObjects.DevopsProjectInfo? SelectedProjectInfo => AzureOrgInfo?.Projects.FirstOrDefault(p => p.ProjectId == SelectedProjectId);
+    protected DataObjects.DevopsGitRepoInfo? SelectedRepoInfo => SelectedProjectInfo?.GitRepos.FirstOrDefault(r => r.RepoId == SelectedRepoId);
+    protected DataObjects.DevopsGitRepoBranchInfo? SelectedBranchInfo => SelectedRepoInfo?.GitBranches.FirstOrDefault(r => r.BranchName == SelectedBranch);
+    private DataObjects.DevopsPipelineDefinition[] ReleasePipelinesList = [];
+    
+    // This defines the variables that will be used in the YAML file for naming the artifact, specifying the project name, and enabling 
+    // the optional controller version and hello world endpoints via the namespace
+    protected Dictionary<string, string> VariablesFileDictionary = new Dictionary<string, string>
+    {
+        { "CI_ProjectName", "" },
+        { "CI_BUILD_CsProjectPath", "" },
+        { "CI_BUILD_Namespace", "" }
+    };
+
+    // this defines the azure project, repo, and branch we will be using to build the yml
+    protected Dictionary<string, string> BuildPipelineDictionary = new Dictionary<string, string>
+    {
+        { "CODE_PROJECT_NAME", "" },
+        { "CODE_REPO_NAME", "" },
+        { "CODE_REPO_BRANCH", "" }
+    };
+    // This defines the variable group names for each environment. The values will be set based on the selected project name.
+    protected Dictionary<string, string> EnviornmentVariableGroupDictionary = new Dictionary<string, string>
+    {
+        { "DEV", "" },
+        { "PROD", "" },
+        { "CMS", "" }
+    };
+
+    
+    protected string buildPipelineTemplate = @"
+# build-and-deploy-pipeline.yml
+name: '$(Date:yyyyMMdd)$(Rev:.r)'
+
+resources:
+  repositories:
+    - repository: TemplateRepo
+      type: git
+      name: 'ReleasePipelines/ReleasePipelines'
+      ref: 'refs/heads/main'
+      trigger: none
+    - repository: BuildRepo
+      type: git
+      name: '{{CODE_PROJECT_NAME}}/{{CODE_REPO_NAME}}'
+      ref: 'refs/heads/{{CODE_REPO_BRANCH}}'
+      trigger:
+        branches:
+          include:
+            - {{CODE_REPO_BRANCH}}
+
+variables:
+  - template: templates/common-variables.yml@TemplateRepo
+
+{{PIPELINE_VARIABLES}}
+
+pool:
+  name: 'BuildVM'
+
+stages:
+  ####################################################################
+  # 0. Pre-Build Stage
+  ####################################################################
+  - stage: PreBuildStage
+    displayName: ""Pre-Build Stage""
+    jobs:
+      - job: PreBuildJob
+        workspace:
+          clean: all
+        displayName: ""Dump Environment Variables""
+        steps:
+          - checkout: none
+          - download: none
+          - template: templates/dump-env-variables-template.yml@TemplateRepo
+
+  # -------------------------------------------------------------------
+  # Build Stage: pass the runtime variables to the build template
+  # -------------------------------------------------------------------
+  - stage: BuildStage
+    displayName: ""Build Stage""
+    jobs:
+      - job: BuildJob
+        displayName: ""Build and Publish Application""
+        pool:
+          name: 'BuildVM'
+        steps:
+          - template: templates/build-template.yml@TemplateRepo
+            parameters:
+              buildProjectName: ""$(CI_ProjectName)""
+              buildCsProjectPath: ""$(CI_BUILD_CsProjectPath)""
+              buildPublishArgs: ""$(CI_PIPELINE_COMMON_PublishArgs)""
+              buildNamespace: ""$(CI_BUILD_Namespace)""
+
+  # -------------------------------------------------------------------
+  # Info Stage: Basic information (env dump, etc.)
+  # -------------------------------------------------------------------
+  - stage: InfoStage
+    displayName: ""Info Stage""
+    jobs:
+      - job: InfoJob
+        displayName: ""Info Job""
+        pool:
+          name: 'BuildVM'
+        steps:
+          - checkout: none
+          - download: none
+          - task: PowerShell@2
+            displayName: ""Just a filler step""
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host ""Hello World""
+
+{{DEPLOY_STAGES}}";
+
+}
+
+@* App specific method definition code section *@
+@code{
+
+    private void NextStep()
+    {
+        if (currentStep < StepNames.Length - 1)
+        {
+            currentStep++;
+            StateHasChanged();
+        }
+    }
+
+    private void PrevStep()
+    {
+        if (currentStep > 0)
+        {
+            currentStep--;
+            StateHasChanged();
+        }
+    }
+
+    // Event handler wrappers for wizard selections that call the existing methods.
+    private async Task ProjectChangedWizard(ChangeEventArgs e)
+    {
+        try
+        {
+            // reset everything
+            SelectedProjectId = e.Value?.ToString() ?? "";
+            SelectedRepoId = "";
+            SelectedBranch = "";
+            // reset all the choices 
+            foreach(var key in BuildPipelineDictionary.Keys)
+            {
+                BuildPipelineDictionary[key] = "";
+            }
+            BuildPipelineDictionary["CODE_PROJECT_NAME"] = SelectedProjectInfo?.ProjectName ?? "";
+
+            foreach(var key in VariablesFileDictionary.Keys)
+            {
+                VariablesFileDictionary[key] = "";
+            }            
+            VariablesFileDictionary["CI_ProjectName"] = SelectedProjectInfo?.ProjectName ?? "";
+
+
+            // repopulate the environment variable group names based on the selected project
+            foreach(var key in EnviornmentVariableGroupDictionary.Keys)
+            {
+                EnviornmentVariableGroupDictionary[key] = "";
+            }
+            foreach(var envKey in EnviornmentVariableGroupDictionary.Keys)
+            {
+                EnviornmentVariableGroupDictionary[envKey] = $"{SelectedProjectInfo?.ProjectName}_{GlobalSettings.App.VariableGroupNameDefault}_{envKey}";
+            }
+
+            Console.WriteLine("Project changed: " + SelectedProjectId);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error in OnProjectChanged: " + ex.Message);
+        }
+        await Task.CompletedTask;
+    }
+
+    private async Task RepoChangedWizard(ChangeEventArgs e)
+    {
+        try
+        {
+            SelectedRepoId = e.Value?.ToString() ?? "";
+            SelectedBranch = "";
+            BuildPipelineDictionary["CODE_REPO_BRANCH"] = "";
+            BuildPipelineDictionary["CODE_REPO_NAME"] = SelectedRepoInfo?.RepoName ?? "";
+            Console.WriteLine("Repository changed: " + SelectedRepoId);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error in OnRepoChanged: " + ex.Message);
+        }
+        await Task.CompletedTask;
+    }
+
+    private async Task BranchChangedWizard(ChangeEventArgs e)
+    {
+        try
+        {
+            SelectedBranch = e.Value?.ToString() ?? "";
+            BuildPipelineDictionary["CODE_REPO_BRANCH"] = SelectedBranch;
+            Console.WriteLine("Branch changed: " + SelectedBranch);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error in OnBranchChanged: " + ex.Message);
+        }
+        await Task.CompletedTask;
+    }
+
+    private async Task CsProjectFileChangedWizard(ChangeEventArgs e)
+    {
+        // This method is called when the user selects a .csproj file.
+        SelectedCsprojPath = e?.Value?.ToString() ?? "";
+        await Task.CompletedTask;
+    }
+    private async Task EnvironmentChangedWizard(string envKey, ChangeEventArgs e)
+    {
+        // Convert the event args value to a boolean.
+        // Note: For checkboxes, you might consider using @bind for simpler two-way binding.
+        bool isChecked = e.Value != null && bool.TryParse(e.Value.ToString(), out bool result) && result;
+
+        // if we just checked it, then we need to create it
+        if (isChecked)
+        {
+            var websiteNameDefault  = GlobalSettings.App.EnvironmentOptions[envKey];
+            var setting = new DataObjects.EnvSetting
+            {
+                EnvName = envKey,
+                IISDeploymentType = "IISWebApplication",
+                WebsiteName = "" + websiteNameDefault,
+                VirtualPath = "/" + SelectedProjectInfo?.ProjectName?.ToLower(),
+                AppPoolName = "" + websiteNameDefault + "." + SelectedProjectInfo?.ProjectName?.ToLower(),
+                    VariableGroupName = $"{SelectedProjectInfo?.ProjectName}_{GlobalSettings.App.VariableGroupNameDefault}_{envKey}"
+            };
+
+            EnvSettings[envKey] = setting; 
+        }
+        else
+        {
+            // we just unchecked it and need to clear it out
+            EnvSettings[envKey] = new();
+        }
+
+        await Task.CompletedTask;
+    }
+    private async Task EnvironmentDeploymentTypeChangedWizard(string envKey, ChangeEventArgs e)
+    {
+        // Convert the event args value to a string.
+        string deploymentType = e.Value?.ToString() ?? "";
+        if (EnvSettings.ContainsKey(envKey))
+        {
+            EnvSettings[envKey].IISDeploymentType = deploymentType;
+            if(deploymentType == "IISWebApplication")
+            {
+                EnvSettings[envKey].VirtualPath = "/" + SelectedProjectInfo?.ProjectName?.ToLower();
+            }
+            else
+            {
+                EnvSettings[envKey].VirtualPath = "";
+            }
+        }
+        await Task.CompletedTask;
+    }
+
+
+
+
+
+
+
+    /*
+     
+    // Helper to get (or create) an environment settings instance
+    private DataObjects.EnvSetting GetEnvSetting(string envKey)
+    {
+        var setting = EnvSettingsList.FirstOrDefault(e => e.EnvName.Equals(envKey, StringComparison.OrdinalIgnoreCase));
+        if (setting == null)
+        {
+
+            var dev = "azuredev.em.wsu.edu";
+            var prod = "prod.em.wsu.edu";
+            var cms = "cms.em.wsu.edu";
+            var websiteNameDefault = "";
+            switch (envKey)
+            {
+                case "DEV":
+                    websiteNameDefault = dev;
+                    break;
+                case "PROD":
+                    websiteNameDefault = prod;
+                    break;
+                case "CMS":
+                    websiteNameDefault = cms;
+                    break;
+                default:
+                    break;
+            }
+
+            setting = new DataObjects.EnvSetting
+                {
+                    EnvName = envKey,
+                    IISDeploymentType = "IISWebApplication",
+                    WebsiteName = "" + websiteNameDefault,
+                    VirtualPath = "/" + SelectedProjectInfo?.ProjectName?.ToLower(),
+                    AppPoolName = "" + websiteNameDefault + "." + SelectedProjectInfo?.ProjectName?.ToLower(),
+                    VariableGroupName = SelectedProjectInfo?.ProjectName?.ToLower().Replace(" ", "") + "_appsettings_" + envKey
+                };
+
+            if (string.IsNullOrWhiteSpace(setting.VirtualPath))
+                if (string.IsNullOrWhiteSpace(setting.VariableGroupName))
+                {
+                    setting.VariableGroupName = string.Empty + SelectedProjectInfo?.ProjectName + "_appsettings_" + envKey;
+                }
+            EnvSettingsList.Add(setting);
+        }
+        return setting;
+    }
+
+     */
+
+
+
+
+
+
+
+
+
+    private async Task PipelineChangedWizard(ChangeEventArgs e)
+    {
+        try
+        {
+            if (int.TryParse(e.Value?.ToString(), out int pid))
+            {
+                SelectedPipelineId = pid;
+                var pipeline = ReleasePipelinesList.FirstOrDefault(p => p.Id == SelectedPipelineId);
+                if (pipeline != null && !string.IsNullOrEmpty(pipeline.YamlFileName))
+                {
+                    var filePath = pipeline.YamlFileName;
+
+                    try
+                    {
+                        YamlContent = await Http.GetStringAsync(DataObjects.Endpoints.ReleasePipelines.GetYmlFileContent + "?filePath=" + Uri.EscapeDataString(filePath));
+                        Console.WriteLine("Loaded pipeline YAML successfully.");
+                    }
+                    catch (Exception ex)
+                    {
+                        YamlContent = "";
+                        Console.WriteLine("Error loading pipeline YAML: " + ex.Message);
+                    }
+                    StateHasChanged();
+                }
+                else
+                {
+                    SelectedPipelineId = 0;
+                    YamlContent = "";
+                }
+            }
+            else
+            {
+                SelectedPipelineId = 0;
+                YamlContent = "";
+            }
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error in OnPipelineChanged: " + ex.Message);
+        };
+
+        await Task.CompletedTask;
+    }
+
+    private DataObjects.EnvSetting GetEnvSetting(string envKey)
+    {
+        throw new NotImplementedException();
+    }
+
+    private async Task NavigateToStep(int i)
+    {
+        currentStep = i;
+        await Task.CompletedTask;
+        StateHasChanged();
+    }
+
+
+    protected async Task SaveYamlChanges(MouseEventArgs args)
+    {
+        // Clear any previous messages
+        Model.ClearMessages();
+        try
+        {
+            if (string.IsNullOrWhiteSpace(YamlContent))
+            {
+                Model.ErrorMessages(new List<string> { "YAML content is empty, nothing to save." });
+                return;
+            }
+            var pipeline = ReleasePipelinesList.FirstOrDefault(p => p.Id == SelectedPipelineId);
+            if (pipeline == null || string.IsNullOrWhiteSpace(pipeline.YamlFileName))
+            {
+                if (!string.IsNullOrWhiteSpace(NewPipelineName))
+                {
+
+                }
+                else
+                {
+                    Model.ErrorMessages(new List<string> { "No pipeline selected or YAML file path is missing." });                    
+                    return;
+                }
+            }
+
+            // Notify user that save is in progress.
+            Model.Message_Saving();
+
+            // Send the updated YAML content to the API
+            var response = await Http.PostAsJsonAsync(
+                DataObjects.Endpoints.ReleasePipelines.UpdateYmlFile + "?filePath=" + Uri.EscapeDataString(pipeline.YamlFileName),
+                YamlContent);
+
+            // Clear the saving message
+            Model.ClearMessages();
+
+            if (response.IsSuccessStatusCode)
+            {
+   
+                YamlContent = await response.Content.ReadAsStringAsync();
+                // Inform the user of success.
+                Model.Message_Saved("YAML file updated successfully.");
+            }
+            else
+            {
+                var errorText = "Failed to update YAML file: " + await response.Content.ReadAsStringAsync();
+                Model.ErrorMessages(new List<string> { errorText });
+            }
+        }
+        catch (Exception ex)
+        {
+            Model.ErrorMessages(new List<string> { "Error while saving YAML: " + ex.Message });
+        }
+    
+    }
+
+    
+    string GeneratePipelineVariablesBlock()
+    {
+        var sb = new System.Text.StringBuilder();
+        foreach (var kv in VariablesFileDictionary)
+        {
+            sb.AppendLine($"  - name: {kv.Key}");
+            sb.AppendLine($"    value: \"{kv.Value}\"");
+        }
+        sb.Append(GenerateEnvVariablesBlock());
+        return sb.ToString();
+    }
+
+    string GenerateEnvVariablesBlock()
+    {
+        var sb = new System.Text.StringBuilder();
+        // use the global list for ordering
+        foreach (var envKey in GlobalSettings.App.EnvironmentOptions.Keys)
+        {
+            var env = EnvSettings[envKey];
+            //add a comment at the start of the yml section
+            sb.AppendLine($"# Environment: {env.EnvName}");
+            sb.AppendLine($"  - name: CI_{envKey}_IISDeploymentType");
+            sb.AppendLine($"    value: \"{env.IISDeploymentType}\"");
+            sb.AppendLine($"  - name: CI_{envKey}_WebsiteName");
+            sb.AppendLine($"    value: \"{env.WebsiteName}\"");
+            sb.AppendLine($"  - name: CI_{envKey}_VirtualPath");
+            sb.AppendLine($"    value: \"{env.VirtualPath}\"");
+            sb.AppendLine($"  - name: CI_{envKey}_AppPoolName");
+            sb.AppendLine($"    value: \"{env.AppPoolName}\"");
+            sb.AppendLine($"  - name: CI_{envKey}_VariableGroup");
+            sb.AppendLine($"    value: \"{env.VariableGroupName}\"");
+            if (!string.IsNullOrWhiteSpace(env.BindingInfo))
+            {
+                sb.AppendLine($"  - name: CI_{envKey}_BindingInfo");
+                sb.AppendLine($"    value: >");
+                sb.AppendLine($"      {env.BindingInfo}");
+            }
+        }
+        return sb.ToString();
+    }
+
+    string GenerateDeployStages()
+    {
+        var sb = new System.Text.StringBuilder();
+        // use the global list for ordering
+        foreach (var envKey in GlobalSettings.App.EnvironmentOptions.Keys)
+        {
+            var env = EnvSettings[envKey];
+            string azureEnv = env.ServerType.Equals("Production", StringComparison.OrdinalIgnoreCase)
+                                ? "AzureProd"
+                                : env.ServerType.Equals("CMS", StringComparison.OrdinalIgnoreCase)
+                                    ? "AzureCMS"
+                                    : "AzureDev";
+            string basePath = azureEnv switch
+            {
+                "AzureProd" => "$(CI_PIPELINE_COMMON_ApplicationFolder_PROD)",
+                "AzureCMS" => "$(CI_PIPELINE_COMMON_ApplicationFolder_CMS)",
+                _ => "$(CI_PIPELINE_COMMON_ApplicationFolder_DEV)"
+            };
+            string dotNetVersion = azureEnv switch
+            {
+                "AzureProd" => "$(CI_PIPELINE_COMMON_DotNetVersion_PROD)",
+                _ => "$(CI_PIPELINE_COMMON_DotNetVersion_DEV)"
+            };
+            string appPoolIdentity = azureEnv switch
+            {
+                "AzureProd" => "$(CI_PIPELINE_COMMON_AppPoolIdentity_PROD)",
+                _ => "$(CI_PIPELINE_COMMON_AppPoolIdentity_DEV)"
+            };
+
+            sb.AppendLine($"  - stage: Deploy{env.EnvName}Stage");
+            sb.AppendLine($"    displayName: \"Deploy to {env.EnvName}\"");
+            sb.AppendLine($"    dependsOn: InfoStage");
+            sb.AppendLine($"    variables:");
+            sb.AppendLine($"      - group: ${{{{ variables.CI_{envKey}_VariableGroup }}}}");
+            sb.AppendLine($"    jobs:");
+            sb.AppendLine($"      - deployment: Deploy{env.EnvName}");
+            sb.AppendLine($"        workspace:");
+            sb.AppendLine($"          clean: all");
+            sb.AppendLine($"        displayName: \"Deploy to {env.EnvName} (Environment-based)\"");
+            sb.AppendLine($"        environment:");
+            sb.AppendLine($"          name: \"{azureEnv}\"");
+            sb.AppendLine($"          resourceType: \"VirtualMachine\"");
+            sb.AppendLine($"        strategy:");
+            sb.AppendLine($"          runOnce:");
+            sb.AppendLine($"            deploy:");
+            sb.AppendLine($"              steps:");
+            sb.AppendLine($"                - checkout: none");
+            sb.AppendLine($"                - template: templates/dump-env-variables-template.yml@TemplateRepo");
+            sb.AppendLine($"                - template: templates/deploy-template.yml@TemplateRepo");
+            sb.AppendLine($"                  parameters:");
+            sb.AppendLine($"                    envFolderName: \"{env.EnvName}\"");
+            sb.AppendLine($"                    basePath: \"{basePath}\"");
+            sb.AppendLine($"                    projectName: \"$(CI_ProjectName)\"");
+            sb.AppendLine($"                    releaseRetention: \"$(CI_PIPELINE_COMMON_ReleaseRetention)\"");
+            sb.AppendLine($"                    IISDeploymentType: \"$(CI_{envKey}_IISDeploymentType)\"");
+            sb.AppendLine($"                    WebsiteName: \"$(CI_{envKey}_WebsiteName)\"");
+            sb.AppendLine($"                    VirtualPath: \"$(CI_{envKey}_VirtualPath)\"");
+            sb.AppendLine($"                    AppPoolName: \"$(CI_{envKey}_AppPoolName)\"");
+            sb.AppendLine($"                    DotNetVersion: \"{dotNetVersion}\"");
+            sb.AppendLine($"                    AppPoolIdentity: \"{appPoolIdentity}\"");
+            if (!string.IsNullOrWhiteSpace(env.BindingInfo))
+            {
+                sb.AppendLine($"                    CustomBindings: \"$(CI_{envKey}_BindingInfo)\"");
+            }
+            sb.AppendLine($"                - template: templates/clean-workspace-template.yml@TemplateRepo");
+            sb.AppendLine();
+        }
+        return sb.ToString();
     }
 }

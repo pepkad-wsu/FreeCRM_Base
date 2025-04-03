@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace CICD;
 
@@ -6,10 +7,10 @@ public partial class DataAccess: IDisposable, IDataAccess
 {
     private int _accountLockoutMaxAttempts = 5;
     private int _accountLockoutMinutes = 10;
-    private string _appName = $"FreeCICD minimal";
+    private string _appName = $"{GlobalSettings.App.Name}";
     private DataObjects.AuthenticationProviders? _authenticationProviders;
     private string _connectionString;
-    private string _copyright = "Company Name";
+    private string _copyright = $"{GlobalSettings.App.CompanyName}";
     private EFDataModel data;
     private bool _firstInit = true;
     private Guid _guid1 = new Guid("00000000-0000-0000-0000-000000000001");
@@ -19,7 +20,7 @@ public partial class DataAccess: IDisposable, IDataAccess
     private HttpResponse? _httpResponse;
     private string _localModeUrl = "";
     private bool _open;
-    private DateOnly _released = DateOnly.FromDateTime(Convert.ToDateTime("3/6/2025"));
+    private DateOnly _released = DateOnly.FromDateTime(Convert.ToDateTime($"{GlobalSettings.App.ReleaseDate}"));
     private IServiceProvider? _serviceProvider;
     private string _uniqueId = Guid.NewGuid().ToString().Replace("-", "").ToLower();
 
@@ -27,10 +28,14 @@ public partial class DataAccess: IDisposable, IDataAccess
     /// The migrations engine is one of the last components I will work on after getting the primary data structure defined.
     /// </summary>
     private bool _useMigrations = false;
-    private string _version = "1.0.0";
+    private string _version = $"{GlobalSettings.App.Version}";
+    private readonly IMemoryCache _cache;
 
-    public DataAccess(string ConnectionString = "",  string LocalModeUrl = "", IServiceProvider? serviceProvider = null)
-    {
+    public DataAccess(string ConnectionString = "",  string LocalModeUrl = "", IServiceProvider? serviceProvider = null, IMemoryCache memoryCache = null)
+    {   
+        // Use the injected memoryCache if provided; otherwise create a new one.
+        _cache = memoryCache ?? new MemoryCache(new MemoryCacheOptions());
+
         _connectionString = ConnectionString;
         _localModeUrl = LocalModeUrl;
         _serviceProvider = serviceProvider;
