@@ -21,10 +21,10 @@ void Main()
 	// The path to the root file location where you have copied the freeCRM Application solution.
 	// This should be a folder containing the CRM.sln file and all the additional
 	// folders for the projects in the solution.
-	filePath = @"C:\Working\CRM";
+	filePath = @"C:\Repos\FileGpt2\FreeCRM_Base";
 	
 	// The name to use to replace CRM with. This should contain no spaces.
-	newAppName = "YourNewAppName";
+	newAppName = "CICD";
 	
 	RenameFoldersAndSolutionFiles();
 	UpdateSolutionFile();

@@ -1,0 +1,64 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34309.116
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{DEAED5CA-A7C0-4A82-A205-40381AA970FD}") = "CICD", "CICD\CICD.csproj", "{2959AA93-5BCF-4A7A-A9F4-FE1F02C88D8F}"
+EndProject
+Project("{DEAED5CA-A7C0-4A82-A205-40381AA970FD}") = "CICD.Client", "CICD.Client\CICD.Client.csproj", "{4A4D2656-1AB7-476D-AA0D-D48104A3E02E}"
+EndProject
+Project("{DEAED5CA-A7C0-4A82-A205-40381AA970FD}") = "CICD.DataAccess", "CICD.DataAccess\CICD.DataAccess.csproj", "{89937E99-3C01-419C-8040-E78248623CFA}"
+EndProject
+Project("{DEAED5CA-A7C0-4A82-A205-40381AA970FD}") = "CICD.DataObjects", "CICD.DataObjects\CICD.DataObjects.csproj", "{1386BBC5-9BDC-4ED4-9C60-74A5CF129A09}"
+EndProject
+Project("{DEAED5CA-A7C0-4A82-A205-40381AA970FD}") = "CICD.EFModels", "CICD.EFModels\CICD.EFModels.csproj", "{D1AA4C80-317F-4127-A2A1-8E28ECD09523}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{61BFF25A-CCD2-42DA-A329-15912E854F2D}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+		LICENSE = LICENSE
+		README.md = README.md
+		Rename FreeCICD.exe = Rename FreeCICD.exe
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CICD.Plugins", "CICD.Plugins\CICD.Plugins.csproj", "{DA2F56DC-47F3-0D3B-E044-6573381EA308}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2959AA93-5BCF-4A7A-A9F4-FE1F02C88D8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2959AA93-5BCF-4A7A-A9F4-FE1F02C88D8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2959AA93-5BCF-4A7A-A9F4-FE1F02C88D8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2959AA93-5BCF-4A7A-A9F4-FE1F02C88D8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A4D2656-1AB7-476D-AA0D-D48104A3E02E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A4D2656-1AB7-476D-AA0D-D48104A3E02E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A4D2656-1AB7-476D-AA0D-D48104A3E02E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A4D2656-1AB7-476D-AA0D-D48104A3E02E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89937E99-3C01-419C-8040-E78248623CFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89937E99-3C01-419C-8040-E78248623CFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89937E99-3C01-419C-8040-E78248623CFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89937E99-3C01-419C-8040-E78248623CFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1386BBC5-9BDC-4ED4-9C60-74A5CF129A09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1386BBC5-9BDC-4ED4-9C60-74A5CF129A09}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1386BBC5-9BDC-4ED4-9C60-74A5CF129A09}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1386BBC5-9BDC-4ED4-9C60-74A5CF129A09}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1AA4C80-317F-4127-A2A1-8E28ECD09523}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1AA4C80-317F-4127-A2A1-8E28ECD09523}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1AA4C80-317F-4127-A2A1-8E28ECD09523}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1AA4C80-317F-4127-A2A1-8E28ECD09523}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA2F56DC-47F3-0D3B-E044-6573381EA308}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA2F56DC-47F3-0D3B-E044-6573381EA308}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA2F56DC-47F3-0D3B-E044-6573381EA308}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA2F56DC-47F3-0D3B-E044-6573381EA308}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C4A59AD0-92A7-475D-A3BC-51E982A9C0FA}
+	EndGlobalSection
+EndGlobal
