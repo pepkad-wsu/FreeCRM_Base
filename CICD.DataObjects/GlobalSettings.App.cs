@@ -19,12 +19,14 @@ public static partial class GlobalSettings
         public static string CompanyName { get; set; } = "Company Name";
         public static string CompanyUrl { get; set; } = "em.wsu.edu";
 
-
         public static Dictionary<string, EnvironmentOptions> EnvironmentOptions = new Dictionary<string, EnvironmentOptions>() {
             { "DEV",  new (){AgentPool ="AzureDev", Hostname = $"dev.{CompanyUrl}", IISJsonFilePath = "" } },
             { "PROD",   new (){AgentPool ="AzureProd",Hostname =  $"prod.{CompanyUrl}", IISJsonFilePath = "" } },
             { "CRM", new (){AgentPool ="AzureCRM",Hostname =  $"crm.{CompanyUrl}", IISJsonFilePath = "" } },
         };
+
+        // anything starting with . _ or XX - OLD - will be ignored.  some common methods of indicating private things so might as well follow it
+        public static List<string> AzureDevOpsProjectNameStartsWithIgnoreValues = ["XX - OLD - ",".", "_"];
 
         public static string IISJsonFilePathDefault= "IISInfo";
         
@@ -32,6 +34,4 @@ public static partial class GlobalSettings
 
         public static string[] AnonamousAccessList = ["ABOUT", "DATABASEOFFLINE", "LOGIN", "LOGOUT", "PROCESSLOGIN", "SETUP", "DEVOPS", "", "HOME"];
     }
-
-
 }

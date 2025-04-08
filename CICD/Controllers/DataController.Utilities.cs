@@ -173,7 +173,13 @@ public partial class DataController
     public async Task SignalRUpdate(DataObjects.SignalRUpdate update)
     {
         if (_signalR != null) {
-            if (update.TenantId.HasValue) {
+            if (!string.IsNullOrWhiteSpace(update.ConnetionId) && !string.IsNullOrWhiteSpace(update.GroupId)) {
+                // in this case the groupid is the thumbprint... we should ensure they aren't trying to fake who they are
+                // fingerprint is set in the dataobjects constructor...  it should be the same as the one in the signalr hub
+                // send directly based on the connection id while ensuring they are still part of the group
+                await _signalR.Clients.Client(update.ConnetionId).SendAsync("SignalRUpdate", update);
+            }
+            else if (update.TenantId.HasValue) {
                 await _signalR.Clients.Group(((Guid)update.TenantId).ToString()).SendAsync("SignalRUpdate", update);
             } else {
                 // This is a non-tenant-specific update.

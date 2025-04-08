@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace CICD.Server.Controllers;
@@ -73,8 +74,9 @@ public partial class DataController
     // GET: api/Data/DevopsGetOrgInfoByPat
     [HttpGet($"~/{DataObjects.Endpoints.DevOps.GetOrgInfoByPat}")]
     [AllowAnonymous]
-    public async Task<ActionResult<DataObjects.DevopsOrgInfo>> GetOrgInfoByPat([FromQuery] string orgName, [FromQuery] string pat)
+    public async Task<ActionResult<DataObjects.DevopsOrgInfo>> GetOrgInfoByPat([FromQuery] string orgName, [FromQuery] string pat, [FromQuery] string? registrationId = null, [FromQuery] string? connectionId = null, [FromQuery] string? groupId = null)
     {
+
         // Build a composite key using the endpoint identifier and the PAT
         string cacheKey = $"DevopsOrgInfo_{pat}";
         DataObjects.DevopsOrgInfo output;
@@ -82,7 +84,7 @@ public partial class DataController
             !string.IsNullOrWhiteSpace(cachedResult?.OrgName)) {
             output = cachedResult;
         } else {
-            output = await da.GetDevopsOrgInfo(pat, orgName);
+            output = await da.GetDevopsOrgInfo(pat, orgName, registrationId,  connectionId , groupId);
             _cache.Set(cacheKey, output, TimeSpan.FromMinutes(5));
         }
         return Ok(output);
@@ -178,6 +180,8 @@ public partial class DataController
             return BadRequest(ex.Message);
         }
     }
+
+
 
     // PUT: api/Data/UpdatePipeline
     [HttpPut("~/api/Data/UpdatePipeline")]

@@ -91,6 +91,7 @@ public class BlazorDataModel
     private string _Theme = "";
     private bool _UseCustomAuthenticationProviderFromAdminAccount = false;
     private DataObjects.User _User = new DataObjects.User();
+    private DataObjects.SignalrClientRegistration _SignalrClientRegistration = new ();
     private List<DataObjects.User> _Users = new List<DataObjects.User>();
     private bool _UseTenantCodeInUrl = false;
     private string _Version = "";
@@ -1361,6 +1362,27 @@ public class BlazorDataModel
         }
     }
 
+    /// <summary>
+    /// The User object for the current user, or an empty User object if no user is logged in.
+    /// </summary>
+    public DataObjects.SignalrClientRegistration SignalrClientRegistration {
+        get { return _SignalrClientRegistration == null ? new() : _SignalrClientRegistration; } 
+        set {
+            if (!ObjectsAreEqual(_SignalrClientRegistration?.RegistrationId, value?.RegistrationId)
+                ||
+                !ObjectsAreEqual(_SignalrClientRegistration?.GroupId, value?.GroupId)
+                || 
+                !ObjectsAreEqual(_SignalrClientRegistration?.ConnectionId, value?.ConnectionId)
+                ){
+                _SignalrClientRegistration = new DataObjects.SignalrClientRegistration {
+                    RegistrationId = (string.Empty + value?.RegistrationId).Trim(),
+                    ConnectionId = (string.Empty + value?.ConnectionId).Trim(), 
+                    GroupId = (string.Empty + value?.GroupId).Trim() };
+                _ModelUpdated = DateTime.UtcNow;
+                NotifyDataChanged();
+            }
+        }
+    }
     /// <summary>
     /// The User object for the current user, or an empty User object if no user is logged in.
     /// </summary>

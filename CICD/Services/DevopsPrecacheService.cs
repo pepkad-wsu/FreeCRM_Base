@@ -31,13 +31,13 @@ namespace CICD.Services
 
         private async Task PrecacheDevopsInfo(string pat,string orgName, CancellationToken cancellationToken)
         {
-            try {
-                var devopsInfo = await _dataAccess.GetDevopsOrgInfo(pat, orgName);
-                string cacheKey = "DevopsOrgInfo";
-                _cache.Set(cacheKey, devopsInfo, TimeSpan.FromMinutes(5));
-            } catch (Exception ex) {
-                Console.WriteLine($"Error pre-caching DevOps info: {ex.Message}");
-            }
+            //try {
+            //    var devopsInfo = await _dataAccess.GetDevopsOrgInfo(pat, orgName);
+            //    string cacheKey = "DevopsOrgInfo";
+            //    _cache.Set(cacheKey, devopsInfo, TimeSpan.FromMinutes(5));
+            //} catch (Exception ex) {
+            //    Console.WriteLine($"Error pre-caching DevOps info: {ex.Message}");
+            //}
         }
     }
 }

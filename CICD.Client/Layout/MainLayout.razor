@@ -606,6 +606,7 @@
 
                 await hubConnection.StartAsync();
 
+                await hubConnection.InvokeAsync("RegisterClient", Model.Fingerprint);
                 await hubConnection.InvokeAsync("JoinTenantId", Model.TenantId);
             }
 
@@ -865,7 +866,13 @@
             var userId = update.UserId;
 
             switch (update.UpdateType) {
+                case DataObjects.SignalRUpdateType.LoadingDevOpsInfoStatusUpdate:
+                    // pass - gets handled on the page
+                    break;
 
+                case DataObjects.SignalRUpdateType.RegisterSignalR:
+                    Model.SignalrClientRegistration = Helpers.DeserializeObject<DataObjects.SignalrClientRegistration>(update.ObjectAsString) ?? new ();
+                    break;
 
                 case DataObjects.SignalRUpdateType.File:
                     var file = Helpers.DeserializeObject<DataObjects.FileStorage>(update.ObjectAsString);

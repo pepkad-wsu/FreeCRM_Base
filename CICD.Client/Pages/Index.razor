@@ -25,11 +25,9 @@
             @for (int i = 0; i < StepNames.Length; i++)
             {
                 <li class="nav-item">
-                    <a class=@("nav-link " + (currentStep == i ? "active" : "") + " " + (i > currentStep ? "disabled-tab" : ""))
-                    style="cursor:pointer"
-                    @onclick="(() => NavigateToStep(i))">
+                    <span class=@("nav-link " + (currentStep == i ? "active" : "") + " " + (i > currentStep ? "disabled-tab" : ""))>
                         @StepNames[i]
-                    </a>
+                    </span>
                 </li>
             }
         </ul>
@@ -65,15 +63,34 @@
                     </div>
                     @if (_loading)
                     {
-                        <div class="d-flex justify-content-center my-5">
-                            
-                            <span class="visually-hidden">Loading Devops Info ... please wait this can take up to a minute.</span>
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Loading Devops Info ... please wait this can take up to a minute.</span>
+                        <div class="d-flex flex-column justify-content-center align-items-center my-5">
+                            <div class="spinner-border text-primary" role="status" aria-label="Loading DevOps Info">
+                                <span class="visually-hidden">Loading DevOps Info</span>
+                            </div>
+                            <div class="mt-3">
+                                <p>Loading DevOps Info... please wait, this can take up to a minute.</p>
                             </div>
                         </div>
+
+                        @if (_loading && _loadingMessages.Any())
+                        {
+                            <div class="card my-3">
+                                <div class="card-header">
+                                    <strong>Process Updates</strong>
+                                </div>
+                                <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                                    <ul class="list-group list-group-flush">
+                                        @foreach (var message in _loadingMessages)
+                                        {
+                                            <li class="list-group-item py-1">
+                                                @message
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                        }
                     }                  
-                        
 
                     <div class="card-footer text-end">
                         <button class="btn btn-primary"
@@ -304,12 +321,19 @@
 
     protected bool _loadedData = false;
     protected bool _loading = false;
+    private List<string> _loadingMessages = new List<string>();
     protected string _pageName = "home";
 
     protected System.Timers.Timer _timer = new System.Timers.Timer();
 
     public void Dispose() {
         _timer.Dispose();
+
+        Model.OnChange -= OnDataModelUpdated;
+        Model.OnSignalRUpdate -= SignalRUpdate;
+
+        Model.Subscribers_OnChange.Remove(_pageName);
+        Model.Subscribers_OnSignalRUpdate.Remove(_pageName);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -349,10 +373,15 @@
     }
 
     protected override void OnInitialized()
-    {
+    {   
         if (!Model.Subscribers_OnChange.Contains(_pageName)){
             Model.Subscribers_OnChange.Add(_pageName);
             Model.OnChange += OnDataModelUpdated;
+        }
+
+        if (!Model.Subscribers_OnSignalRUpdate.Contains(_pageName)){
+            Model.Subscribers_OnSignalRUpdate.Add(_pageName);
+            Model.OnSignalRUpdate += SignalRUpdate;
         }
 
         _timer = new System.Timers.Timer();
@@ -369,6 +398,16 @@
         if (Model.View == _pageName) {
             StateHasChanged();
         }
+    }
+
+    protected async void SignalRUpdate(DataObjects.SignalRUpdate update)
+    {
+        if (update.UpdateType == DataObjects.SignalRUpdateType.LoadingDevOpsInfoStatusUpdate) {
+            _loadingMessages.Add(update.Message);
+            Console.WriteLine("update:" + update.Message);
+            StateHasChanged();
+        }
+        await Task.CompletedTask;
     }
 
     protected string LogoUrl
@@ -535,6 +574,7 @@ stages:
 
     private void NextStep()
     {
+        _loadingMessages = new List<string>();
         if (currentStep < StepNames.Length - 1)
         {
             currentStep++;
@@ -544,6 +584,7 @@ stages:
 
     private void PrevStep()
     {
+        _loadingMessages = new List<string>();
         if (currentStep > 0)
         {
             currentStep--;
@@ -553,13 +594,21 @@ stages:
 
     private async Task PATandOrgNameChangedWizard()
     {
+        _loadingMessages = new List<string>();
         _loading = true;
         StateHasChanged();
         try
         {
             try
             {
-                AzureOrgInfo = await Http.GetFromJsonAsync<DataObjects.DevopsOrgInfo>(DataObjects.Endpoints.DevOps.GetOrgInfoByPat + "?orgName=" + Uri.EscapeDataString(OrgName) + "&pat=" + Uri.EscapeDataString(DevOpsPAT));
+                //string? registrationId = null, [FromQuery] string? connectionId = null, [FromQuery] string? groupId = null)
+                AzureOrgInfo = await Http.GetFromJsonAsync<DataObjects.DevopsOrgInfo>(DataObjects.Endpoints.DevOps.GetOrgInfoByPat 
+                    + "?orgName=" + Uri.EscapeDataString(OrgName) + 
+                    "&pat=" + Uri.EscapeDataString(DevOpsPAT)+ 
+                    "&registrationId=" + Uri.EscapeDataString((string.Empty + Model?.SignalrClientRegistration?.RegistrationId).Trim())+ 
+                    "&connectionId=" + Uri.EscapeDataString((string.Empty + Model?.SignalrClientRegistration?.ConnectionId).Trim())+ 
+                    "&groupId=" + Uri.EscapeDataString((string.Empty + Model?.SignalrClientRegistration?.GroupId).Trim())
+                );
                 if (AzureOrgInfo != null && AzureOrgInfo.Projects != null && AzureOrgInfo.Projects.Any())
                 {
                     Console.WriteLine("Loaded DevOps Info successfully.");
@@ -657,6 +706,8 @@ stages:
         }
         await Task.CompletedTask;
     }
+    
+
 
     private async Task CsProjectFileChangedWizard(ChangeEventArgs e)
     {

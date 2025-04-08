@@ -37,7 +37,7 @@ namespace CICD
 
         Task<DataObjects.GitUpdateResult> EditGitFile(string projectId, string repoId, string branch, string filePath, string fileContent, string pat, string orgName);
         // Organization Operations
-        Task<DataObjects.DevopsOrgInfo> GetDevopsOrgInfo(string pat, string orgName);
+        Task<DataObjects.DevopsOrgInfo> GetDevopsOrgInfo(string pat, string orgName, string? registrationId = null, string? connectionId = null, string? groupId = null);
         Task<DataObjects.DevopsVariableGroup> CreateVariableGroup(string projectId, string pat, string orgName, DataObjects.DevopsVariableGroup newGroup);
         Task<DataObjects.DevopsVariableGroup> UpdateVariableGroup(string projectId, string pat, string orgName, DataObjects.DevopsVariableGroup updatedGroup);
         Task<string> GetGitFileContent(string projectId, string repoId, string branch, string filePath, string pat, string orgName);
@@ -66,12 +66,22 @@ namespace CICD
         }
 
         #region Organization Operations
-        public async Task<DataObjects.DevopsOrgInfo> GetDevopsOrgInfo(string pat, string orgName)
+        public async Task<DataObjects.DevopsOrgInfo> GetDevopsOrgInfo(string pat, string orgName, string? registrationId = null, string? connectionId = null, string? groupId = null)
         {
             var output = new DataObjects.DevopsOrgInfo {
                 OrgName = orgName ?? "wsueit",
                 Projects = new List<DataObjects.DevopsProjectInfo>()
             };
+            
+            if(!string.IsNullOrWhiteSpace(registrationId) && !string.IsNullOrWhiteSpace(connectionId) && !string.IsNullOrWhiteSpace(groupId)) {
+                await SignalRUpdate(new DataObjects.SignalRUpdate {
+                    UpdateType = DataObjects.SignalRUpdateType.LoadingDevOpsInfoStatusUpdate,
+                    GroupId = $"{groupId}_{registrationId}",
+                    ConnetionId = connectionId,
+                    Message = "Start of lookup"
+                });
+            }
+
 
             using (var connection = CreateConnection(pat, orgName)) {
                 try {
@@ -79,7 +89,7 @@ namespace CICD
                     List<TeamProjectReference> projects = new List<TeamProjectReference>();
                     try {
                         projects = (await projectClient.GetProjects()).ToList();
-                        projects = projects.Where(o => !((string.Empty + o.Name).ToLower().StartsWith("xx - old -"))).ToList();
+                        projects = projects.Where(o => !GlobalSettings.App.AzureDevOpsProjectNameStartsWithIgnoreValues.Any(v => (string.Empty + o.Name).ToLower().StartsWith((string.Empty + v).ToLower()))).ToList();
                         Console.WriteLine($"Found {projects.Count} projects in organization '{output.OrgName}':");
                     } catch (Exception ex) {
                         Console.WriteLine($"Error fetching projects for organization '{output.OrgName}': {ex.Message}");
