@@ -633,26 +633,13 @@
 
             switch (Model.View) {
                 case "appsettings":
-                case "editdepartment":
-                case "editdepartmentgroup":
-                case "editlocation":
-                case "editservice":
-                case "edittag":
                 case "edittenant":
                 case "edituser":
-                case "editusergroup":
-                case "departmentgroups":
-                case "departments":
                 case "files":
                 case "language":
-                case "locations":
-                case "services":
                 case "settings":
-                case "tags":
                 case "tenants":
-                case "udf":
                 case "users":
-                case "usergroups":
                     output = true;
                     break;
             }
@@ -878,7 +865,7 @@
             var userId = update.UserId;
 
             switch (update.UpdateType) {
-              
+
 
                 case DataObjects.SignalRUpdateType.File:
                     var file = Helpers.DeserializeObject<DataObjects.FileStorage>(update.ObjectAsString);
@@ -1209,7 +1196,7 @@
                             allowAnonymousAccess = true;
                         }
 
-                        if (!allowAnonymousAccess) {
+                        if (!allowAnonymousAccess) {    
                             if(GlobalSettings.App.AnonamousAccessList
                                 .Select(o => string.Empty + o?.ToUpper())
                                 .Contains(string.Empty + pagename?.ToUpper())) {

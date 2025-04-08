@@ -4,7 +4,8 @@
 @implements IDisposable
 @inject HttpClient Http
 
-@if (Model.Loaded && Model.LoggedIn && Model.View == _pageName) {
+
+@if (Model.Loaded && Model.View == _pageName) {
     if (!String.IsNullOrWhiteSpace(LogoUrl) && Model.Tenant.TenantSettings.LogoIncludedOnHomePage) {
         <div class="home-page-logo-container">
             <img src="@LogoUrl" class="logo-homepage" />
@@ -285,12 +286,15 @@
         if (Model.Loaded) {
             if (Model.LoggedIn) {
                 if (!_loadedData) {
+                    // todo: load repo data 
                     _loadedData = true;
                     await Helpers.ValidateUrl(TenantCode, true);
                 }
-            } else {
-                Helpers.NavigateTo("Login");
-            }
+                else
+                {
+                    // we need to update the interface to collect a pat and post it off. 
+                }
+            } 
         }
     }
 
