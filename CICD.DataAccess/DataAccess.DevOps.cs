@@ -6,20 +6,22 @@
 // grouped into regions by functionality.
 // =============================================================================
 
+using Microsoft.CodeAnalysis;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.TeamFoundation.Build.WebApi;
+using Microsoft.TeamFoundation.Common;
 using Microsoft.TeamFoundation.Core.WebApi;
+using Microsoft.TeamFoundation.DistributedTask.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
-using Microsoft.Extensions.Caching.Memory;
+using Mysqlx.Crud;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using Microsoft.TeamFoundation.DistributedTask.WebApi;
 using System.Threading.Tasks;
-using Microsoft.CodeAnalysis;
 
 namespace CICD
 {
@@ -35,7 +37,7 @@ namespace CICD
 
         Task<DataObjects.GitUpdateResult> EditGitFile(string projectId, string repoId, string branch, string filePath, string fileContent, string pat, string orgName);
         // Organization Operations
-        Task<DataObjects.DevopsOrgInfo> GetDevopsOrgInfo(string pat, string orgName, string variablesProjectId);
+        Task<DataObjects.DevopsOrgInfo> GetDevopsOrgInfo(string pat, string orgName);
         Task<DataObjects.DevopsVariableGroup> CreateVariableGroup(string projectId, string pat, string orgName, DataObjects.DevopsVariableGroup newGroup);
         Task<DataObjects.DevopsVariableGroup> UpdateVariableGroup(string projectId, string pat, string orgName, DataObjects.DevopsVariableGroup updatedGroup);
         Task<string> GetGitFileContent(string projectId, string repoId, string branch, string filePath, string pat, string orgName);
@@ -64,7 +66,7 @@ namespace CICD
         }
 
         #region Organization Operations
-        public async Task<DataObjects.DevopsOrgInfo> GetDevopsOrgInfo(string pat, string orgName, string variablesProjectId)
+        public async Task<DataObjects.DevopsOrgInfo> GetDevopsOrgInfo(string pat, string orgName)
         {
             var output = new DataObjects.DevopsOrgInfo {
                 OrgName = orgName ?? "wsueit",
@@ -77,12 +79,13 @@ namespace CICD
                     List<TeamProjectReference> projects = new List<TeamProjectReference>();
                     try {
                         projects = (await projectClient.GetProjects()).ToList();
+                        projects = projects.Where(o => !((string.Empty + o.Name).ToLower().StartsWith("xx - old -"))).ToList();
                         Console.WriteLine($"Found {projects.Count} projects in organization '{output.OrgName}':");
                     } catch (Exception ex) {
                         Console.WriteLine($"Error fetching projects for organization '{output.OrgName}': {ex.Message}");
                     }
 
-                    var projectTasks = projects.Select(async project => {
+                    var projectTasks = projects.Where(o => !o.Name.Contains("xx")).Select(async project => {
                         var projInfo = new DataObjects.DevopsProjectInfo {
                             ProjectName = project.Name,
                             ProjectId = project.Id.ToString(),
@@ -99,6 +102,15 @@ namespace CICD
                         // TODO:  If starts with xx just continue;
                         //
                         projInfo.ResourceUrl = string.Empty + projectResource.Href;
+
+                        // ok so now we need to attach the variable group info
+                        //List<DataObjects.DevopsVariableGroup>
+                        if (!string.IsNullOrEmpty(projInfo.ProjectId)) {
+
+                            projInfo.DevopsVariableGroups = await GetProjectVariableGroupsAsync(pat, orgName, projInfo.ProjectId);
+                        } else {
+                            projInfo.DevopsVariableGroups = new List<DataObjects.DevopsVariableGroup>();
+                        }
 
                         try {
                             var gitClient = connection.GetClient<GitHttpClient>();
@@ -177,7 +189,9 @@ namespace CICD
                                                                         FileType = Path.GetExtension(item.Path),
                                                                         ResourceUrl = resourceUrl
                                                                     };
-                                                                    fileStructure.Files.Add(fileItem);
+                                                                    if(fileItem.FileType == ".csproj" || fileItem.FileType == ".yml") {
+                                                                        fileStructure.Files.Add(fileItem);
+                                                                    }
                                                                 }
                                                             }
                                                         }
@@ -218,9 +232,6 @@ namespace CICD
                 }
             }
 
-            // ok so now we need to attach the variable group info
-            //List<DataObjects.DevopsVariableGroup>
-            output.DevopsVariableGroups = await GetProjectVariableGroupsAsync(pat, orgName, variablesProjectId);
 
             Console.WriteLine("Done.");
             output.CreationDate = DateTime.UtcNow;

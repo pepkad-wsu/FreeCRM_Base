@@ -64,7 +64,25 @@ public partial class DataController
             !string.IsNullOrWhiteSpace(cachedResult?.OrgName)) {
             output = cachedResult;
         } else {
-            output = await da.GetDevopsOrgInfo(config.pat, config.orgName, config.projectId);
+            output = await da.GetDevopsOrgInfo(config.pat, config.orgName);
+            _cache.Set(cacheKey, output, TimeSpan.FromMinutes(5));
+        }
+        return Ok(output);
+    }
+
+    // GET: api/Data/DevopsGetOrgInfoByPat
+    [HttpGet($"~/{DataObjects.Endpoints.DevOps.GetOrgInfoByPat}")]
+    [AllowAnonymous]
+    public async Task<ActionResult<DataObjects.DevopsOrgInfo>> GetOrgInfoByPat([FromQuery] string orgName, [FromQuery] string pat)
+    {
+        // Build a composite key using the endpoint identifier and the PAT
+        string cacheKey = $"DevopsOrgInfo_{pat}";
+        DataObjects.DevopsOrgInfo output;
+        if (_cache.TryGetValue(cacheKey, out DataObjects.DevopsOrgInfo cachedResult) &&
+            !string.IsNullOrWhiteSpace(cachedResult?.OrgName)) {
+            output = cachedResult;
+        } else {
+            output = await da.GetDevopsOrgInfo(pat, orgName);
             _cache.Set(cacheKey, output, TimeSpan.FromMinutes(5));
         }
         return Ok(output);

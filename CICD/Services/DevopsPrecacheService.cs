@@ -18,22 +18,21 @@ namespace CICD.Services
         {
             var pat = _configuration.GetValue<string>("DevOpsPAT");
             var orgName = _configuration.GetValue<string>("DevOpsOrgName");
-            var projectId = _configuration.GetValue<string>("DevOpsProjectId");
             if (string.IsNullOrWhiteSpace(pat)) {
                 // No PAT provided—skip precaching.
                 return;
             }
-            await PrecacheDevopsInfo(pat, orgName, projectId, stoppingToken);
+            await PrecacheDevopsInfo(pat, orgName, stoppingToken);
             while (!stoppingToken.IsCancellationRequested) {
                 await Task.Delay(TimeSpan.FromMinutes(4), stoppingToken);
-                await PrecacheDevopsInfo(pat,orgName, projectId, stoppingToken);
+                await PrecacheDevopsInfo(pat,orgName, stoppingToken);
             }
         }
 
-        private async Task PrecacheDevopsInfo(string pat,string orgName,string variablesProjectId, CancellationToken cancellationToken)
+        private async Task PrecacheDevopsInfo(string pat,string orgName, CancellationToken cancellationToken)
         {
             try {
-                var devopsInfo = await _dataAccess.GetDevopsOrgInfo(pat, orgName, variablesProjectId);
+                var devopsInfo = await _dataAccess.GetDevopsOrgInfo(pat, orgName);
                 string cacheKey = "DevopsOrgInfo";
                 _cache.Set(cacheKey, devopsInfo, TimeSpan.FromMinutes(5));
             } catch (Exception ex) {

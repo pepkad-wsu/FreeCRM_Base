@@ -23,6 +23,7 @@ namespace CICD
             {
                 public const string GetIISInfo = "api/Data/DevopsGetIISInfo";
                 public const string GetWsuEitOrgInfo = "api/Data/DevopsGetWsuEitOrgInfo";
+                public const string GetOrgInfoByPat = "api/Data/DevopsGetOrgInfoByPat";
                 public const string GetBranchCsProjFileList = "api/Data/DevopsGetBranchCsProjFileList";
             }
 
@@ -176,6 +177,7 @@ namespace CICD
             public List<DevopsProjectInfo> Projects { get; set; } = new();
             public string? ResourceUrl { get; set; }
             public List<DataObjects.DevopsVariableGroup> DevopsVariableGroups { get; set; } = new();
+
         }
 
         public class DevopsPipelineDefinition
@@ -198,6 +200,7 @@ namespace CICD
             public string ProjectId { get; set; } = string.Empty;
             public string ProjectName { get; set; } = string.Empty;
             public string? ResourceUrl { get; set; }
+            public List<DataObjects.DevopsVariableGroup> DevopsVariableGroups { get; set; } = new();
         }
 
         public class FileContentItem

@@ -36,9 +36,56 @@
 
         <!-- Wizard Step Content -->
         <div class="wizard-tab-content">
-            @if (currentStep == 0)
-            {
-                <!-- Step 0: Select Project -->
+            @if (currentStep == 0) {
+                <!-- Step 0: Select PAT and org info -->
+
+                <div class="card">
+                    <div class="card-header">
+                        Azure DevOps Credentials
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="patInput" class="form-label">Personal Access Token (PAT):</label>
+                            <input type="password"
+                                   disabled="@(_loading)"
+                                   id="patInput"
+                                   class="form-control"
+                                   @bind="DevOpsPAT"
+                                   placeholder="Enter your Azure DevOps PAT" />
+                        </div>
+                        <div class="mb-3">
+                            <label for="orgNameInput" class="form-label">Organization Name:</label>
+                            <input type="text"
+                                   disabled="@(_loading)"
+                                   id="orgNameInput"
+                                   class="form-control"
+                                   @bind="OrgName"
+                                   placeholder="Enter your Organization Name" />
+                        </div>
+                    </div>
+                    @if (_loading)
+                    {
+                        <div class="d-flex justify-content-center my-5">
+                            
+                            <span class="visually-hidden">Loading Devops Info ... please wait this can take up to a minute.</span>
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading Devops Info ... please wait this can take up to a minute.</span>
+                            </div>
+                        </div>
+                    }                  
+                        
+
+                    <div class="card-footer text-end">
+                        <button class="btn btn-primary"
+                                @onclick="PATandOrgNameChangedWizard"
+                                disabled="@(_loading || string.IsNullOrWhiteSpace(DevOpsPAT) || string.IsNullOrWhiteSpace(OrgName))">
+                            Next
+                        </button>
+                    </div>
+                     
+                </div>
+            }else if (currentStep == 1) {
+                <!-- Step 1: Select Project -->
                 <div class="card">
                     <div class="card-header">Select Project</div>
                     <div class="card-body">
@@ -49,7 +96,7 @@
                             {
                                 @foreach (var proj in AzureOrgInfo.Projects.OrderBy(o => (string.Empty + o.ProjectName).ToLower()))
                                 {
-                                    <option value="@proj.ProjectId">@proj.ProjectName</option>
+                                    <option value="@proj.ProjectId" selected="@(proj.ProjectId == SelectedProjectInfo?.ProjectId ? "selected" : null)">@proj.ProjectName</option>
                                 }
                             }
                         </select>
@@ -58,10 +105,8 @@
                         <button class="btn btn-primary" @onclick="NextStep" disabled="@(string.IsNullOrEmpty(SelectedProjectId))">Next</button>
                     </div>
                 </div>
-            }
-            else if (currentStep == 1)
-            {
-                <!-- Step 1: Select Repository -->
+            } else if (currentStep == 2) {
+                <!-- Step 2: Select Repository -->
                 <div class="card">
                     <div class="card-header">Select Repository</div>
                     <div class="card-body">
@@ -72,7 +117,7 @@
                             {
                                 @foreach (var repo in SelectedProjectInfo.GitRepos.OrderBy(o => (string.Empty + o.RepoName).ToLower()))
                                 {
-                                    <option value="@repo.RepoId">@repo.RepoName</option>
+                                    <option value="@repo.RepoId" selected="@(repo.RepoId == SelectedRepoInfo?.RepoId ? "selected" : null)">@repo.RepoName</option>
                                 }
                             }
                         </select>
@@ -82,10 +127,8 @@
                         <button class="btn btn-primary" @onclick="NextStep" disabled="@(string.IsNullOrEmpty(SelectedRepoId))">Next</button>
                     </div>
                 </div>
-            }
-            else if (currentStep == 2)
-            {
-                <!-- Step 2: Select Branch -->
+            } else if (currentStep == 3) {
+                <!-- Step 3: Select Branch -->
                 <div class="card">
                     <div class="card-header">Select Branch</div>
                     <div class="card-body">
@@ -96,7 +139,7 @@
                             {
                                 @foreach (var branch in SelectedRepoInfo.GitBranches.OrderBy(o => (string.Empty + o.BranchName).ToLower()))
                                 {
-                                    <option value="@branch.BranchName">@branch.BranchName</option>
+                                    <option value="@branch.BranchName" selected="@(branch.BranchName == SelectedBranchInfo?.BranchName ? "selected" : null)">@branch.BranchName</option>
                                 }
                             }
                         </select>
@@ -106,10 +149,8 @@
                         <button class="btn btn-primary" @onclick="NextStep" disabled="@(string.IsNullOrEmpty(SelectedBranch))">Next</button>
                     </div>
                 </div>
-            }
-             else if (currentStep == 3)
-            {
-                <!-- Step 3: Select .csproj File -->
+            } else if (currentStep == 4) {
+                <!-- Step 4: Select .csproj File -->
                 <div class="card">
                     <div class="card-header">Select .csproj File</div>
                     <div class="card-body">
@@ -133,7 +174,7 @@
                                     <option value="">-- Select .csproj file --</option>
                                     @foreach (var file in csprojFiles.OrderBy(f => f.Path))
                                     {
-                                        <option value="@file.Path">@file.Path</option>
+                                        <option value="@file.Path" selected="@(file.Path == SelectedCsprojPath ? "selected" : null)">@file.Path</option>
                                     }
                                 </select>
                             }
@@ -145,10 +186,8 @@
                         <button class="btn btn-primary" @onclick="NextStep">Next</button>
                     </div>
                 </div>                                                                      
-            } 
-            else if (currentStep == 4)
-            {
-                <!-- Step 4: Environment Settings -->
+            } else if (currentStep == 5) {
+                <!-- Step 5: Environment Settings -->
                 <div class="card">
                     <div class="card-header">Environment Settings</div>
                     <div class="card-body">
@@ -165,10 +204,11 @@
                                 <div class="border p-2 mb-3">
                                     <h6>@envKey Environment Settings</h6>
                                     <label class="form-label">IIS Deployment Type:</label>
-                                    <select class="form-select"@onchange="@(e => EnvironmentDeploymentTypeChangedWizard(envKey, e))">
-                                        <option value="IISWebsite">IISWebsite</option>
-                                        <option value="IISWebApplication">IISWebApplication</option>
+                                    <select class="form-select" @onchange="@(e => EnvironmentDeploymentTypeChangedWizard(envKey, e))">
+                                        <option value="IISWebsite" selected="@(envSetting.IISDeploymentType == "IISWebsite" ? "selected" : null)">IISWebsite</option>
+                                        <option value="IISWebApplication" selected="@(envSetting.IISDeploymentType == "IISWebApplication" ? "selected" : null)">IISWebApplication</option>
                                     </select>
+
                                     <label class="form-label">Website Name:</label>
                                     <input type="text" class="form-control" @bind="envSetting.WebsiteName" />
                                     @if(envSetting.IISDeploymentType == "IISWebApplication")
@@ -189,29 +229,27 @@
                         <button class="btn btn-primary" @onclick="NextStep">Next</button>
                     </div>
                 </div>
-            }
-            else if (currentStep == 4)
-            {
-                <!-- Step 4: Pipeline Selection -->
+            } else if (currentStep == 6) {
+                <!-- Step 6: Pipeline Selection -->
                 <div class="card">
                     <div class="card-header">Pipeline Selection</div>
                     <div class="card-body">
                         <label class="form-label">Select Existing Pipeline:</label>
-                        <select class="form-select" value="@SelectedPipelineId" @onchange="@(e => {PipelineChangedWizard(e); })">
+                        <select class="form-select" @onchange="@(e => PipelineChangedWizard(e) )">
                             <option value="">-- Select Pipeline or Create New --</option>
                             @foreach (var group in ReleasePipelinesList.GroupBy(p => p.Path).OrderBy(g => g.Key))
                             {
                                 <optgroup label="@group.Key">
                                     @foreach (var pipe in group.OrderBy(p => p.Name))
                                     {
-                                        <option value="@pipe.Id">@pipe.Name</option>
+                                        <option value="@pipe.Id"  selected="@(pipe.Id == SelectedPipelineInfo?.Id ? "selected" : null)">@pipe.Name</option>
                                     }
                                 </optgroup>
                             }
                         </select>
 
 
-                        @if (SelectedPipelineId <= 0)
+                        @if (SelectedPipelineId <= 0 || SelectedPipelineId == null)
                         {
                             <div class="mt-3">
                                 <label class="form-label">New Pipeline Name:</label>
@@ -236,10 +274,8 @@
                         <button class="btn btn-primary" @onclick="NextStep" disabled="@(SelectedPipelineId <= 0 && string.IsNullOrWhiteSpace(NewPipelineName))">Next</button>
                     </div>
                 </div>
-            }
-            else if (currentStep == 6)
-            {
-                <!-- Step 6: YAML Preview & Save -->
+            } else if (currentStep == 7) {
+                <!-- Step 7: YAML Preview & Save -->
                 <div class="card">
                     <div class="card-header">YAML Preview & Save</div>
                     <div class="card-body">
@@ -286,15 +322,29 @@
         if (Model.Loaded) {
             if (Model.LoggedIn) {
                 if (!_loadedData) {
-                    // todo: load repo data 
                     _loadedData = true;
                     await Helpers.ValidateUrl(TenantCode, true);
+                    currentStep = 1; // skip the PAT and orgname step if we are logged in
+                    // ok so now we are logged in, that means we dont need to collect a PAT or ORGNAME
+                    // so for now just go and lookup the projectnames and other orginfo
+                    _loading = true;
+                    await LoadDevOpsInfoAsync();
+                    _loading = false;
+                    StateHasChanged();
                 }
-                else
-                {
-                    // we need to update the interface to collect a pat and post it off. 
+            } else {
+                if (!_loadedData) {
+                    _loadedData = true;
+                    await Helpers.ValidateUrl(TenantCode, true);
+                    _loading = true;
+                    OrgName = string.Empty;
+                    DevOpsPAT = string.Empty;
+                    currentStep = 0; // skip the PAT and orgname step if we are logged in
+                    _loading = false;
+
+                    StateHasChanged();
                 }
-            } 
+            }
         }
     }
 
@@ -350,19 +400,23 @@
     private string? SelectedBranch = string.Empty;
     private string? SelectedCsprojPath = string.Empty;
     private string? NewPipelineName = string.Empty;
-    private int? SelectedPipelineId;
+    private int? SelectedPipelineId = 0;
     private string YamlContent = string.Empty;
     private bool IsCreatingPipelineLoading = false;
-
+    
+    // This is the PAT and OrgName that will be used when not logged in, allows annonymous access site usage
+    private string DevOpsPAT { get; set; } = string.Empty;
+    private string OrgName { get; set; } = string.Empty;
     
     // Environment selection state used in the UI (for checkboxes)
-    private Dictionary<string, DataObjects.EnvSetting> EnvSettings = GlobalSettings.App.EnvironmentOptions.Keys.ToDictionary(env => env, env => new DataObjects.EnvSetting()) ?? new Dictionary<string, DataObjects.EnvSetting>();
+    private Dictionary<string, DataObjects.EnvSetting> EnvSettings = new ();
 
-    private string[] StepNames = ["Select Project", "Select Repository", "Select Branch", "Pipeline Selection", "Select .csproj File", "Environment Settings", "Variable Group Details", "YAML Preview & Save"];
+    private string[] StepNames = ["Select PAT", "Select Project", "Select Repository", "Select Branch", "Pipeline Selection", "Select .csproj File", "Environment Settings", "Variable Group Details", "YAML Preview & Save"];
 
     protected DataObjects.DevopsProjectInfo? SelectedProjectInfo => AzureOrgInfo?.Projects.FirstOrDefault(p => p.ProjectId == SelectedProjectId);
     protected DataObjects.DevopsGitRepoInfo? SelectedRepoInfo => SelectedProjectInfo?.GitRepos.FirstOrDefault(r => r.RepoId == SelectedRepoId);
     protected DataObjects.DevopsGitRepoBranchInfo? SelectedBranchInfo => SelectedRepoInfo?.GitBranches.FirstOrDefault(r => r.BranchName == SelectedBranch);
+    protected DataObjects.DevopsPipelineDefinition? SelectedPipelineInfo => ReleasePipelinesList?.FirstOrDefault(p => p.Id == SelectedPipelineId);
     private DataObjects.DevopsPipelineDefinition[] ReleasePipelinesList = [];
     
     // This defines the variables that will be used in the YAML file for naming the artifact, specifying the project name, and enabling 
@@ -497,6 +551,39 @@ stages:
         }
     }
 
+    private async Task PATandOrgNameChangedWizard()
+    {
+        _loading = true;
+        StateHasChanged();
+        try
+        {
+            try
+            {
+                AzureOrgInfo = await Http.GetFromJsonAsync<DataObjects.DevopsOrgInfo>(DataObjects.Endpoints.DevOps.GetOrgInfoByPat + "?orgName=" + Uri.EscapeDataString(OrgName) + "&pat=" + Uri.EscapeDataString(DevOpsPAT));
+                if (AzureOrgInfo != null && AzureOrgInfo.Projects != null && AzureOrgInfo.Projects.Any())
+                {
+                    Console.WriteLine("Loaded DevOps Info successfully.");
+                    // now move to the next step
+                    NextStep();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading DevOps Info: {ex.Message}");
+            }
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error in PATandOrgNameChangedWizard: " + ex.Message);
+        }
+        finally
+        {
+            _loading = false;
+            await Task.CompletedTask;
+        }
+    }
+
     // Event handler wrappers for wizard selections that call the existing methods.
     private async Task ProjectChangedWizard(ChangeEventArgs e)
     {
@@ -534,7 +621,7 @@ stages:
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Error in OnProjectChanged: " + ex.Message);
+            Console.WriteLine("Error in ProjectChangedWizard: " + ex.Message);
         }
         await Task.CompletedTask;
     }
@@ -551,7 +638,7 @@ stages:
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Error in OnRepoChanged: " + ex.Message);
+            Console.WriteLine("Error in RepoChangedWizard: " + ex.Message);
         }
         await Task.CompletedTask;
     }
@@ -566,7 +653,7 @@ stages:
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Error in OnBranchChanged: " + ex.Message);
+            Console.WriteLine("Error in BranchChangedWizard: " + ex.Message);
         }
         await Task.CompletedTask;
     }
@@ -586,7 +673,7 @@ stages:
         // if we just checked it, then we need to create it
         if (isChecked)
         {
-            var websiteNameDefault  = GlobalSettings.App.EnvironmentOptions[envKey];
+            string websiteNameDefault  = GlobalSettings.App.EnvironmentOptions[envKey]?.Hostname ?? string.Empty;
             var setting = new DataObjects.EnvSetting
             {
                 EnvName = envKey,
@@ -602,7 +689,10 @@ stages:
         else
         {
             // we just unchecked it and need to clear it out
-            EnvSettings[envKey] = new();
+            if (EnvSettings.ContainsKey(envKey))
+            {
+                EnvSettings.Remove(envKey);
+            }
         }
 
         await Task.CompletedTask;
@@ -625,70 +715,6 @@ stages:
         }
         await Task.CompletedTask;
     }
-
-
-
-
-
-
-
-    /*
-     
-    // Helper to get (or create) an environment settings instance
-    private DataObjects.EnvSetting GetEnvSetting(string envKey)
-    {
-        var setting = EnvSettingsList.FirstOrDefault(e => e.EnvName.Equals(envKey, StringComparison.OrdinalIgnoreCase));
-        if (setting == null)
-        {
-
-            var dev = "azuredev.em.wsu.edu";
-            var prod = "prod.em.wsu.edu";
-            var cms = "cms.em.wsu.edu";
-            var websiteNameDefault = "";
-            switch (envKey)
-            {
-                case "DEV":
-                    websiteNameDefault = dev;
-                    break;
-                case "PROD":
-                    websiteNameDefault = prod;
-                    break;
-                case "CMS":
-                    websiteNameDefault = cms;
-                    break;
-                default:
-                    break;
-            }
-
-            setting = new DataObjects.EnvSetting
-                {
-                    EnvName = envKey,
-                    IISDeploymentType = "IISWebApplication",
-                    WebsiteName = "" + websiteNameDefault,
-                    VirtualPath = "/" + SelectedProjectInfo?.ProjectName?.ToLower(),
-                    AppPoolName = "" + websiteNameDefault + "." + SelectedProjectInfo?.ProjectName?.ToLower(),
-                    VariableGroupName = SelectedProjectInfo?.ProjectName?.ToLower().Replace(" ", "") + "_appsettings_" + envKey
-                };
-
-            if (string.IsNullOrWhiteSpace(setting.VirtualPath))
-                if (string.IsNullOrWhiteSpace(setting.VariableGroupName))
-                {
-                    setting.VariableGroupName = string.Empty + SelectedProjectInfo?.ProjectName + "_appsettings_" + envKey;
-                }
-            EnvSettingsList.Add(setting);
-        }
-        return setting;
-    }
-
-     */
-
-
-
-
-
-
-
-
 
     private async Task PipelineChangedWizard(ChangeEventArgs e)
     {
@@ -914,5 +940,22 @@ stages:
             sb.AppendLine();
         }
         return sb.ToString();
+    }
+
+    
+    private async Task LoadDevOpsInfoAsync()
+    {
+        try
+        {
+            AzureOrgInfo = await Http.GetFromJsonAsync<DataObjects.DevopsOrgInfo>(DataObjects.Endpoints.DevOps.GetWsuEitOrgInfo);
+            if (AzureOrgInfo != null && AzureOrgInfo.Projects != null && AzureOrgInfo.Projects.Any())
+            {
+                Console.WriteLine("Loaded DevOps Info successfully.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading DevOps Info: {ex.Message}");
+        }
     }
 }
